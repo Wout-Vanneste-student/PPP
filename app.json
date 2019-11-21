@@ -2,11 +2,14 @@
   "expo": {
     "name": "Personify - Personal Assistant",
     "slug": "personify",
+    "owner": "Wout Vanneste",
     "privacy": "public",
     "sdkVersion": "35.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": ["ios", "android"],
     "version": "1.0.0",
+    "githubUrl": "https://github.com/Wout-Vanneste-student/PPP.git",
     "orientation": "portrait",
+    "primaryColor": "#A3C9E2",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -19,6 +22,19 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
+    },
+    "extra": {
+      "firebase": {
+        "apiKey": "AIzaSyDZ6qQ8GNXzDZZvlSaAH1SzynRJYggKWx4",
+        "authDomain": "personify-personal-assistant.firebaseapp.com",
+        "databaseURL": "https://personify-personal-assistant.firebaseio.com",
+        "projectId": "personify-personal-assistant",
+        "storageBucket": "bucket.appspot.com",
+        "messagingSenderId": "910409518320"
+      },
+      "facebook": {
+        "appId": "419173292362855"
+      }
     }
   }
 }
