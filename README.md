@@ -19,4 +19,4 @@ What I want to deliver is an app that is available on ios and android.
 
 - Url to my blog
 
-http://woutvanneste.be/howest/3dev/ppp/
+https://medium.com/personal-passion-project-personify-personal
