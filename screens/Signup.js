@@ -3,7 +3,7 @@ import { Text, StyleSheet, YellowBox, View } from "react-native";
 import { Container, Form, Input, Item, Button, Label } from "native-base";
 import firebase from "../config/Firebase";
 import _ from "lodash";
-import Loader from "../components/loader";
+import Loader from "./loader";
 
 /* This is to hide warnings about setting a timer */
 YellowBox.ignoreWarnings(["Setting a timer"]);
@@ -30,7 +30,10 @@ class Signup extends Component {
       password2Good: false,
       canSubmit: false,
       showLoading: false,
-      userFound: false
+      userFound: false,
+      userName: "",
+      userNameGood: false,
+      userNameError: ""
     };
   }
 
@@ -48,15 +51,15 @@ class Signup extends Component {
       });
     } else {
       this.setState({ emailGood: true });
-    }
-    if (
-      this.state.emailGood === true &&
-      this.state.passwordGood === true &&
-      this.state.password2Good === true
-    ) {
-      this.setState({ canSubmit: true });
-    } else {
-      this.setState({ canSubmit: false });
+      if (
+        this.state.userNameGood === true &&
+        this.state.passwordGood === true &&
+        this.state.password2Good === true
+      ) {
+        this.setState({ canSubmit: true });
+      } else {
+        this.setState({ canSubmit: false });
+      }
     }
   };
 
@@ -93,18 +96,18 @@ class Signup extends Component {
       });
     } else {
       this.setState({ passwordGood: true });
+      if (
+        this.state.emailGood === true &&
+        this.state.userNameGood === true &&
+        this.state.password2Good === true
+      ) {
+        this.setState({ canSubmit: true });
+      } else {
+        this.setState({ canSubmit: false });
+      }
     }
     if (this.state.password2.length > 0) {
       this.handleBlurPassword2();
-    }
-    if (
-      this.state.emailGood === true &&
-      this.state.passwordGood === true &&
-      this.state.password2Good === true
-    ) {
-      this.setState({ canSubmit: true });
-    } else {
-      this.setState({ canSubmit: false });
     }
   };
 
@@ -117,35 +120,75 @@ class Signup extends Component {
       });
     } else {
       this.setState({ password2Good: true });
+      if (
+        this.state.emailGood === true &&
+        this.state.passwordGood === true &&
+        this.state.userNameGood === true
+      ) {
+        this.setState({ canSubmit: true });
+      } else {
+        this.setState({ canSubmit: false });
+      }
     }
-    if (
-      this.state.emailGood === true &&
-      this.state.passwordGood === true &&
-      this.state.password2Good === true
-    ) {
-      this.setState({ canSubmit: true });
+  };
+
+  handleBluruserName = () => {
+    const name = this.state.userName;
+    if (name.length >= 3) {
+      this.setState({ userNameGood: true });
+      if (
+        this.state.emailGood === true &&
+        this.state.passwordGood === true &&
+        this.state.password2Good === true
+      ) {
+        this.setState({ canSubmit: true });
+      } else {
+        this.setState({ canSubmit: false });
+      }
     } else {
-      this.setState({ canSubmit: false });
+      this.setState({
+        userNameError: "Your username should be at least 3 characters long"
+      });
     }
   };
 
   handleSubmit = async (email, password) => {
-    this.setState({ showLoading: true });
-    try {
-      const response = await firebase.signupWithEmail(email, password);
-      if (response.user.uid) {
-        this.setState({ userFound: true });
-        const { uid } = response.user;
-        const userData = { email, password, uid };
-        await firebase.createNewUser(userData);
-      }
-    } catch (error) {
-      console.log(error.message);
-    } finally {
-      if (this.state.userFound === true) {
-        this.setState({ showLoading: false });
-        const { navigate } = this.props.navigation;
-        navigate("Home");
+    this.handleBluruserName();
+    this.handleBlurPassword();
+    this.handleBlurPassword2();
+    this.handleBlurEmail();
+    const {
+      emailError,
+      passwordError,
+      password2Error,
+      userNameError
+    } = this.state;
+    if (
+      (((emailError === passwordError) === password2Error) ===
+        userNameError) ===
+      ""
+    ) {
+      console.log("alles goed");
+      this.setState({ showLoading: true });
+      try {
+        const response = await firebase.signupWithEmail(email, password);
+        if (response.user.uid) {
+          this.setState({ userFound: true });
+          const { uid } = response.user;
+          const username = this.state.userName;
+          const userData = { username, email, password, uid };
+          await firebase.createNewUser(userData);
+          // await firebase.addUserName(uid, this.state.userName);
+          console.log("na awaits");
+        }
+      } catch (error) {
+        console.log(error.message);
+      } finally {
+        if (this.state.userFound === true) {
+          this.setState({ showLoading: false });
+          const { navigate } = this.props.navigation;
+          navigate("Home");
+        }
       }
     }
   };
@@ -156,6 +199,23 @@ class Signup extends Component {
       <>
         <Container>
           <Form style={styles.form}>
+            <Item
+              style={styles.item}
+              error={this.state.userNameError.length > 0 ? true : false}
+              success={this.state.userNameGood === true ? true : false}
+              floatingLabel
+            >
+              <Label style={styles.label}>Username</Label>
+              <Input
+                autoCorrect={false}
+                autoCapitalize="none"
+                onChangeText={userName =>
+                  this.setState({ userName, userNameError: "" })
+                }
+                onBlur={this.handleBluruserName}
+              ></Input>
+            </Item>
+            <Text style={styles.error}>{this.state.userNameError}</Text>
             <Item
               style={styles.item}
               error={this.state.emailError.length > 0 ? true : false}
@@ -214,25 +274,25 @@ class Signup extends Component {
           <View>
             <Loader loading={this.state.showLoading === true ? true : false} />
           </View>
+          <Button
+            style={styles.submit}
+            full
+            rounded
+            onPress={() => navigate("Login")}
+          >
+            <Text>Already an account? Login</Text>
+          </Button>
+          <Button
+            full
+            rounded
+            disabled={this.state.canSubmit === true ? false : true}
+            onPress={() =>
+              this.handleSubmit(this.state.email, this.state.password)
+            }
+          >
+            <Text>Sign up!</Text>
+          </Button>
         </Container>
-        <Button
-          style={styles.submit}
-          full
-          rounded
-          onPress={() => navigate("Login")}
-        >
-          <Text>Already an account? Login</Text>
-        </Button>
-        <Button
-          full
-          rounded
-          disabled={this.state.canSubmit}
-          onPress={() =>
-            this.handleSubmit(this.state.email, this.state.password)
-          }
-        >
-          <Text>Sign up!</Text>
-        </Button>
       </>
     );
   }
@@ -259,6 +319,12 @@ const styles = StyleSheet.create({
   },
   submit: {
     backgroundColor: "yellow"
+  },
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: "auto"
   }
 });
 

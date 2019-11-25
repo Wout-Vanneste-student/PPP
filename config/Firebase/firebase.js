@@ -32,6 +32,14 @@ const Firebase = {
       .collection("users")
       .doc(`${userData.uid}`)
       .set(userData);
+  },
+  addUserName: (userId, username) => {
+    return firebase
+      .database()
+      .ref("users/" + userId)
+      .set({
+        userName: username
+      });
   }
 };
 

@@ -9,7 +9,7 @@ import {
 import { Container, Form, Input, Item, Button, Label } from "native-base";
 import firebase from "../config/Firebase";
 import _ from "lodash";
-import Loader from "../components/loader";
+import Loader from "./loader";
 
 /* This is to hide warnings about setting a timer */
 YellowBox.ignoreWarnings(["Setting a timer"]);
@@ -28,6 +28,8 @@ class Login extends Component {
       email: "",
       password: "",
       loginError: "",
+      emailError: "",
+      passwordError: "",
       canSubmit: false,
       userFound: false,
       showLoading: false
@@ -65,9 +67,45 @@ class Login extends Component {
     }
   };
 
-  handleBlur = () => {
+  handleBlurEmail = () => {
+    const email = this.state.email;
+    if (this.state.email.length === 0) {
+      this.setState({
+        canSubmit: false,
+        emailError: "Please enter your email address."
+      });
+    } else {
+      let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      if (reg.test(email) === true) {
+        this.setState({ canSubmit: true });
+      } else {
+        this.setState({
+          canSubmit: false,
+          emailError: "Please enter a valid email address."
+        });
+      }
+    }
+  };
+
+  handleBlurPassword = () => {
     if (this.state.email.length > 0 && this.state.password.length > 0) {
       this.setState({ canSubmit: true });
+    }
+
+    if (this.state.password.length === 0) {
+      this.setState({
+        canSubmit: false,
+        passwordError: "Please enter your password."
+      });
+    } else if (6 > this.state.password.length > 0) {
+      this.setState({
+        canSubmit: false,
+        passwordError: "Please enter a valid password."
+      });
+    } else {
+      this.setState({
+        canSubmit: true
+      });
     }
   };
 
@@ -82,43 +120,47 @@ class Login extends Component {
               <Input
                 autoCorrect={false}
                 autoCapitalize="none"
-                onChangeText={email => this.setState({ email })}
+                onChangeText={email => this.setState({ email, emailError: "" })}
                 keyboardType="email-address"
-                onBlur={this.handleBlur}
+                onBlur={this.handleBlurEmail}
               ></Input>
             </Item>
+            <Text style={styles.error}>{this.state.emailError}</Text>
             <Item style={styles.item} floatingLabel iconRight>
               <Label style={styles.label}>Password</Label>
               <Input
                 autoCorrect={false}
                 secureTextEntry={true}
                 autoCapitalize="none"
-                onChangeText={password => this.setState({ password })}
-                onBlur={this.handleBlur}
+                onChangeText={password =>
+                  this.setState({ password, passwordError: "" })
+                }
+                onBlur={this.handleBlurPwd}
               ></Input>
             </Item>
+            <Text style={styles.error}>{this.state.passwordError}</Text>
             <Text style={styles.error}>{this.state.loginError}</Text>
           </Form>
           <View>
             <Loader loading={this.state.showLoading} />
           </View>
+          <Button
+            style={styles.submit}
+            full
+            rounded
+            onPress={() => navigate("Signup")}
+          >
+            <Text>No account yet? Signup</Text>
+          </Button>
+          <Button
+            full
+            rounded
+            disabled={this.state.canSubmit === true ? false : true}
+            onPress={() => this.handleLogin()}
+          >
+            <Text>Log in</Text>
+          </Button>
         </Container>
-        <Button
-          style={styles.submit}
-          full
-          rounded
-          onPress={() => navigate("Signup")}
-        >
-          <Text>No account yet? Signup</Text>
-        </Button>
-        <Button
-          full
-          rounded
-          disabled={this.state.canSubmit === true ? false : true}
-          onPress={() => this.handleLogin()}
-        >
-          <Text>Log in</Text>
-        </Button>
       </>
     );
   }
@@ -145,6 +187,12 @@ const styles = StyleSheet.create({
   },
   submit: {
     backgroundColor: "yellow"
+  },
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: "auto"
   }
 });
 
