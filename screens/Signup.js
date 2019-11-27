@@ -6,13 +6,13 @@ import _ from "lodash";
 import Loader from "./loader";
 
 /* This is to hide warnings about setting a timer */
-YellowBox.ignoreWarnings(["Setting a timer"]);
-const _console = _.clone(console);
-console.warn = message => {
-  if (message.indexOf("Setting a timer") <= -1) {
-    _console.warn(message);
-  }
-};
+// YellowBox.ignoreWarnings(["Setting a timer"]);
+// const _console = _.clone(console);
+// console.warn = message => {
+//   if (message.indexOf("Setting a timer") <= -1) {
+//     _console.warn(message);
+//   }
+// };
 /* End code to hide warnings about timer */
 
 class Signup extends Component {
@@ -164,11 +164,11 @@ class Signup extends Component {
       userNameError
     } = this.state;
     if (
-      (((emailError === passwordError) === password2Error) ===
-        userNameError) ===
-      ""
+      emailError === "" &&
+      passwordError === "" &&
+      password2Error === "" &&
+      userNameError === ""
     ) {
-      console.log("alles goed");
       this.setState({ showLoading: true });
       try {
         const response = await firebase.signupWithEmail(email, password);
@@ -178,8 +178,6 @@ class Signup extends Component {
           const username = this.state.userName;
           const userData = { username, email, password, uid };
           await firebase.createNewUser(userData);
-          // await firebase.addUserName(uid, this.state.userName);
-          console.log("na awaits");
         }
       } catch (error) {
         console.log(error.message);
