@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import CountButton from "../components/CountButton";
 import { connect } from "react-redux";
-import { incrementCount, decrementCount } from "../actions/index";
+import { incrementCount, decrementCount } from "../actions/CounterAction";
 import { Text } from "react-native";
 
-class CounterComponent extends Component {
+class CounterContainer extends Component {
   handleBtnActionIncrement = () => {
     this.props.onIncrementClick(this.props.count);
   };
@@ -48,4 +48,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CounterComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(CounterContainer);

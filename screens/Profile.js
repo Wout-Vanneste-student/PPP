@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { Text, View, Button } from "react-native";
-import { connect } from "react-redux";
 
-import CounterComponent from "../containers/CounterComponent";
+import CounterContainer from "../plugins/counter/containers";
 class Profile extends Component {
   static navigationOptions = {
     header: null
@@ -15,7 +14,7 @@ class Profile extends Component {
         <View>
           <Text>Profile page</Text>
           <Button title="Home" onPress={() => navigate("Home")} />
-          <CounterComponent />
+          <CounterContainer />
         </View>
       </>
     );
