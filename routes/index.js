@@ -8,11 +8,12 @@ import { createStackNavigator } from "react-navigation-stack";
 
 // LOGIN SIGNUP HOME ...
 const MainNavigator = createStackNavigator({
-  Profile: { screen: Profile },
   Login: { screen: Login },
   Signup: { screen: Signup },
+  Profile: { screen: Profile },
   Home: { screen: Home }
 });
+
 const AppContainer = createAppContainer(MainNavigator);
 
 export default AppContainer;

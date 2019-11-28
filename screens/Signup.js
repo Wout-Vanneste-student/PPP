@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, YellowBox, View } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 import { Container, Form, Input, Item, Button, Label } from "native-base";
 import firebase from "../config/Firebase";
 import _ from "lodash";
@@ -176,8 +176,10 @@ class Signup extends Component {
           this.setState({ userFound: true });
           const { uid } = response.user;
           const username = this.state.userName;
-          const userData = { username, email, password, uid };
+          let userData = { email, password, uid };
           await firebase.createNewUser(userData);
+          userData = { username, email, password, uid };
+          await firebase.addUserData(uid, userData);
         }
       } catch (error) {
         console.log(error.message);

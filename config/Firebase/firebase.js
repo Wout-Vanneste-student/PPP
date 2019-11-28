@@ -20,12 +20,6 @@ const Firebase = {
   checkUserAuth: user => {
     return firebase.auth().onAuthStateChanged(user);
   },
-  updateProfile: (user, name) => {
-    user.updateProfile({
-      displayName: name
-    });
-    return "updated";
-  },
   createNewUser: userData => {
     return firebase
       .firestore()
@@ -33,13 +27,35 @@ const Firebase = {
       .doc(`${userData.uid}`)
       .set(userData);
   },
-  addUserName: (userId, username) => {
+  addUserData: (userId, userData) => {
     return firebase
       .database()
       .ref("users/" + userId)
-      .set({
-        userName: username
-      });
+      .set(userData);
+  },
+  getCurrentUser: () => {
+    return firebase.auth().currentUser;
+  },
+  getCurrentUserId: () => {
+    return firebase.auth().currentUser.uid;
+  },
+  addPushToken: (token, userId) => {
+    return firebase
+      .database()
+      .ref("users/" + userId + "/push_token")
+      .set(token);
+  },
+  getCurrentUserName: userId => {
+    return firebase
+      .database()
+      .ref("users/" + userId + "/username")
+      .once("value");
+  },
+  getCurrentUserWithId: userId => {
+    return firebase
+      .database()
+      .ref("users/" + userId)
+      .once("value");
   }
 };
 

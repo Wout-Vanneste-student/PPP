@@ -1,11 +1,5 @@
 import React, { Component } from "react";
-import {
-  Text,
-  StyleSheet,
-  YellowBox,
-  View,
-  TouchableHighlight
-} from "react-native";
+import { Text, StyleSheet, YellowBox, View, AsyncStorage } from "react-native";
 import { Container, Form, Input, Item, Button, Label } from "native-base";
 import firebase from "../config/Firebase";
 import _ from "lodash";
@@ -32,7 +26,8 @@ class Login extends Component {
       passwordError: "",
       canSubmit: false,
       userFound: false,
-      showLoading: false
+      showLoading: false,
+      currentUser: ""
     };
   }
 
@@ -48,6 +43,8 @@ class Login extends Component {
       if (response.user.uid) {
         this.setState({ userFound: true });
       }
+      const userId = response.user.uid;
+      AsyncStorage.setItem("userId", JSON.stringify(userId));
     } catch (error) {
       /*
       Currently the error message gets shown to the user
@@ -106,6 +103,39 @@ class Login extends Component {
       this.setState({
         canSubmit: true
       });
+    }
+  };
+
+  componentDidMount() {
+    this._retrieveData();
+  }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("userId");
+      if (value !== null) {
+        // We have data!!
+        var currentId = value.substring(1, value.length - 1);
+        const currentUser = await firebase.getCurrentUserWithId(currentId);
+        let email, password, currentData;
+        currentUser.forEach(data => {
+          switch (data.key) {
+            case "email":
+              currentData = JSON.stringify(data);
+              email = currentData.substring(1, currentData.length - 1);
+              break;
+            case "password":
+              currentData = JSON.stringify(data);
+              password = currentData.substring(1, currentData.length - 1);
+              break;
+          }
+        });
+        this.setState({ email, password });
+        this.handleLogin();
+      }
+    } catch (error) {
+      console.log("error: ", error);
+      // Error retrieving data
     }
   };
 
