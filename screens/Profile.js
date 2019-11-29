@@ -1,5 +1,14 @@
 import React, { Component } from "react";
-import { Text, View, Button, StyleSheet } from "react-native";
+import {
+  Text,
+  View,
+  Button,
+  StyleSheet,
+  AsyncStorage,
+  Platform,
+  StatusBar,
+  SafeAreaView
+} from "react-native";
 import { CounterContainer } from "../plugins/counter";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
@@ -72,46 +81,56 @@ class Profile extends Component {
     });
   };
 
+  handleSignout = async () => {
+    const { navigate } = this.props.navigation;
+    firebase
+      .signOut()
+      .then(AsyncStorage.clear())
+      .then(navigate("Startup"));
+  };
+
   render() {
     const { navigate } = this.props.navigation;
     return (
-      <>
-        <Container>
-          <View>
-            <Text>Profile page</Text>
-            <Button title="Home" onPress={() => navigate("Home")} />
-            <CounterContainer />
+      <SafeAreaView style={styles.hideStatusBar}>
+        <View>
+          <Text>Profile page</Text>
+          <Button title="Home" onPress={() => navigate("Home")} />
+          <CounterContainer />
 
-            <Button
-              title="send notification"
-              onPress={() => this.sendNotification("penis", "is dik")}
-            />
-          </View>
-          <Form style={styles.form}>
-            <Item style={styles.item} floatingLabel>
-              <Label style={styles.label}>Title</Label>
-              <Input
-                autoCorrect={false}
-                autoCapitalize="none"
-                onChangeText={title => this.setState({ title })}
-              ></Input>
-            </Item>
-            <Item floatingLabel>
-              <Label>Message</Label>
-              <Input
-                autoCorrect={false}
-                autoCapitalize="none"
-                onChangeText={message => this.setState({ message })}
-              ></Input>
-            </Item>
-          </Form>
-        </Container>
-      </>
+          <Button
+            title="send notification"
+            onPress={() => this.sendNotification("penis", "is dik")}
+          />
+        </View>
+        <Form style={styles.form}>
+          <Item style={styles.item} floatingLabel>
+            <Label style={styles.label}>Title</Label>
+            <Input
+              autoCorrect={false}
+              autoCapitalize="none"
+              onChangeText={title => this.setState({ title })}
+            ></Input>
+          </Item>
+          <Item floatingLabel>
+            <Label>Message</Label>
+            <Input
+              autoCorrect={false}
+              autoCapitalize="none"
+              onChangeText={message => this.setState({ message })}
+            ></Input>
+          </Item>
+        </Form>
+        <Button title="Log out" onPress={() => this.handleSignout()}></Button>
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  hideStatusBar: {
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+  },
   item: {
     marginLeft: 0,
     paddingLeft: 0,

@@ -1,5 +1,13 @@
 import React, { Component } from "react";
-import { Text, View, Button } from "react-native";
+import {
+  Text,
+  SafeAreaView,
+  View,
+  Button,
+  Platform,
+  StatusBar,
+  StyleSheet
+} from "react-native";
 import firebase from "../config/Firebase";
 
 class Home extends Component {
@@ -26,17 +34,22 @@ class Home extends Component {
   render() {
     const { navigate } = this.props.navigation;
     return (
-      <>
+      <SafeAreaView style={styles.hideStatusBar}>
         <View>
           <Text>Home page</Text>
         </View>
         <Button title="Profile" onPress={() => navigate("Profile")} />
         <View>
-          <Text>Welcome back {this.state.username}!</Text>
+          <Text>Welcome {this.state.username}!</Text>
         </View>
-      </>
+      </SafeAreaView>
     );
   }
 }
+const styles = StyleSheet.create({
+  hideStatusBar: {
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+  }
+});
 
 export default Home;

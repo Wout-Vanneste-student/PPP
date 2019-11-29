@@ -1,8 +1,14 @@
-import React, { Component } from "react";
-import { StyleSheet, View, Modal, ActivityIndicator } from "react-native";
+import React from "react";
+import {
+  StyleSheet,
+  View,
+  Modal,
+  ActivityIndicator,
+  SafeAreaView
+} from "react-native";
 
 const Loader = props => {
-  const { loading, ...attributes } = props;
+  const { loading } = props;
 
   return (
     <Modal
@@ -13,11 +19,11 @@ const Loader = props => {
         console.log("close modal");
       }}
     >
-      <View style={styles.modalBackground}>
+      <SafeAreaView>
         <View style={styles.activityIndicatorWrapper}>
           <ActivityIndicator animating={loading} />
         </View>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 };

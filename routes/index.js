@@ -1,4 +1,5 @@
 import Home from "../screens/Home";
+import Startup from "../screens/Startup";
 import Login from "../screens/Login";
 import Signup from "../screens/Signup";
 import Profile from "../screens/Profile";
@@ -8,6 +9,7 @@ import { createStackNavigator } from "react-navigation-stack";
 
 // LOGIN SIGNUP HOME ...
 const MainNavigator = createStackNavigator({
+  Startup: { screen: Startup },
   Login: { screen: Login },
   Signup: { screen: Signup },
   Profile: { screen: Profile },

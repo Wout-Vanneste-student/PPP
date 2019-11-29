@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, View } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  View,
+  Platform,
+  StatusBar,
+  SafeAreaView
+} from "react-native";
 import { Container, Form, Input, Item, Button, Label } from "native-base";
 import firebase from "../config/Firebase";
 import _ from "lodash";
@@ -196,109 +203,110 @@ class Signup extends Component {
   render() {
     const { navigate } = this.props.navigation;
     return (
-      <>
-        <Container>
-          <Form style={styles.form}>
-            <Item
-              style={styles.item}
-              error={this.state.userNameError.length > 0 ? true : false}
-              success={this.state.userNameGood === true ? true : false}
-              floatingLabel
-            >
-              <Label style={styles.label}>Username</Label>
-              <Input
-                autoCorrect={false}
-                autoCapitalize="none"
-                onChangeText={userName =>
-                  this.setState({ userName, userNameError: "" })
-                }
-                onBlur={this.handleBluruserName}
-              ></Input>
-            </Item>
-            <Text style={styles.error}>{this.state.userNameError}</Text>
-            <Item
-              style={styles.item}
-              error={this.state.emailError.length > 0 ? true : false}
-              success={this.state.emailGood === true ? true : false}
-              floatingLabel
-            >
-              <Label style={styles.label}>Email</Label>
-              <Input
-                autoCorrect={false}
-                autoCapitalize="none"
-                onChangeText={email => this.setState({ email, emailError: "" })}
-                keyboardType="email-address"
-                onBlur={this.handleBlurEmail}
-              ></Input>
-            </Item>
-            <Text style={styles.error}>{this.state.emailError}</Text>
-            <Item
-              style={styles.item}
-              floatingLabel
-              iconRight
-              error={this.state.passwordError.length > 0 ? true : false}
-              success={this.state.passwordGood === true ? true : false}
-            >
-              <Label style={styles.label}>Password</Label>
-              <Input
-                autoCorrect={false}
-                secureTextEntry={true}
-                autoCapitalize="none"
-                onChangeText={password =>
-                  this.setState({ password, passwordError: "" })
-                }
-                onBlur={this.handleBlurPassword}
-              ></Input>
-            </Item>
-            <Text style={styles.error}>{this.state.passwordError}</Text>
-            <Item
-              style={styles.item}
-              floatingLabel
-              iconRight
-              error={this.state.password2Error.length > 0 ? true : false}
-              success={this.state.password2Good === true ? true : false}
-            >
-              <Label style={styles.label}>Repeat password</Label>
-              <Input
-                autoCorrect={false}
-                secureTextEntry={true}
-                autoCapitalize="none"
-                onChangeText={password2 =>
-                  this.setState({ password2, password2Error: "" })
-                }
-                onBlur={this.handleBlurPassword2}
-              ></Input>
-            </Item>
-            <Text style={styles.error}>{this.state.password2Error}</Text>
-          </Form>
-          <View>
-            <Loader loading={this.state.showLoading === true ? true : false} />
-          </View>
-          <Button
-            style={styles.submit}
-            full
-            rounded
-            onPress={() => navigate("Login")}
+      <SafeAreaView style={styles.hideStatusBar}>
+        <Form style={styles.form}>
+          <Item
+            style={styles.item}
+            error={this.state.userNameError.length > 0 ? true : false}
+            success={this.state.userNameGood === true ? true : false}
+            floatingLabel
           >
-            <Text>Already an account? Login</Text>
-          </Button>
-          <Button
-            full
-            rounded
-            disabled={this.state.canSubmit === true ? false : true}
-            onPress={() =>
-              this.handleSubmit(this.state.email, this.state.password)
-            }
+            <Label style={styles.label}>Username</Label>
+            <Input
+              autoCorrect={false}
+              autoCapitalize="none"
+              onChangeText={userName =>
+                this.setState({ userName, userNameError: "" })
+              }
+              onBlur={this.handleBluruserName}
+            ></Input>
+          </Item>
+          <Text style={styles.error}>{this.state.userNameError}</Text>
+          <Item
+            style={styles.item}
+            error={this.state.emailError.length > 0 ? true : false}
+            success={this.state.emailGood === true ? true : false}
+            floatingLabel
           >
-            <Text>Sign up!</Text>
-          </Button>
-        </Container>
-      </>
+            <Label style={styles.label}>Email</Label>
+            <Input
+              autoCorrect={false}
+              autoCapitalize="none"
+              onChangeText={email => this.setState({ email, emailError: "" })}
+              keyboardType="email-address"
+              onBlur={this.handleBlurEmail}
+            ></Input>
+          </Item>
+          <Text style={styles.error}>{this.state.emailError}</Text>
+          <Item
+            style={styles.item}
+            floatingLabel
+            iconRight
+            error={this.state.passwordError.length > 0 ? true : false}
+            success={this.state.passwordGood === true ? true : false}
+          >
+            <Label style={styles.label}>Password</Label>
+            <Input
+              autoCorrect={false}
+              secureTextEntry={true}
+              autoCapitalize="none"
+              onChangeText={password =>
+                this.setState({ password, passwordError: "" })
+              }
+              onBlur={this.handleBlurPassword}
+            ></Input>
+          </Item>
+          <Text style={styles.error}>{this.state.passwordError}</Text>
+          <Item
+            style={styles.item}
+            floatingLabel
+            iconRight
+            error={this.state.password2Error.length > 0 ? true : false}
+            success={this.state.password2Good === true ? true : false}
+          >
+            <Label style={styles.label}>Repeat password</Label>
+            <Input
+              autoCorrect={false}
+              secureTextEntry={true}
+              autoCapitalize="none"
+              onChangeText={password2 =>
+                this.setState({ password2, password2Error: "" })
+              }
+              onBlur={this.handleBlurPassword2}
+            ></Input>
+          </Item>
+          <Text style={styles.error}>{this.state.password2Error}</Text>
+        </Form>
+        <View>
+          <Loader loading={this.state.showLoading === true ? true : false} />
+        </View>
+        <Button
+          style={styles.submit}
+          full
+          rounded
+          onPress={() => navigate("Login")}
+        >
+          <Text>Already an account? Login</Text>
+        </Button>
+        <Button
+          full
+          rounded
+          disabled={this.state.canSubmit === true ? false : true}
+          onPress={() =>
+            this.handleSubmit(this.state.email, this.state.password)
+          }
+        >
+          <Text>Sign up!</Text>
+        </Button>
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  hideStatusBar: {
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+  },
   error: {
     margin: 0,
     padding: 0,

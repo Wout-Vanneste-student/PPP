@@ -1,5 +1,14 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, YellowBox, View, AsyncStorage } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  YellowBox,
+  View,
+  AsyncStorage,
+  Platform,
+  StatusBar,
+  SafeAreaView
+} from "react-native";
 import { Container, Form, Input, Item, Button, Label } from "native-base";
 import firebase from "../config/Firebase";
 import _ from "lodash";
@@ -50,6 +59,7 @@ class Login extends Component {
       Currently the error message gets shown to the user
       maybe I will change this to custom messages in the future
       */
+      console.log(error);
       this.setState({
         loginError: error.message,
         showLoading: false,
@@ -106,97 +116,65 @@ class Login extends Component {
     }
   };
 
-  componentDidMount() {
-    this._retrieveData();
-  }
-
-  _retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem("userId");
-      if (value !== null) {
-        // We have data!!
-        var currentId = value.substring(1, value.length - 1);
-        const currentUser = await firebase.getCurrentUserWithId(currentId);
-        let email, password, currentData;
-        currentUser.forEach(data => {
-          switch (data.key) {
-            case "email":
-              currentData = JSON.stringify(data);
-              email = currentData.substring(1, currentData.length - 1);
-              break;
-            case "password":
-              currentData = JSON.stringify(data);
-              password = currentData.substring(1, currentData.length - 1);
-              break;
-          }
-        });
-        this.setState({ email, password });
-        this.handleLogin();
-      }
-    } catch (error) {
-      console.log("error: ", error);
-      // Error retrieving data
-    }
-  };
-
   render() {
     const { navigate } = this.props.navigation;
     return (
-      <>
-        <Container>
-          <Form style={styles.form}>
-            <Item style={styles.item} floatingLabel>
-              <Label style={styles.label}>Email</Label>
-              <Input
-                autoCorrect={false}
-                autoCapitalize="none"
-                onChangeText={email => this.setState({ email, emailError: "" })}
-                keyboardType="email-address"
-                onBlur={this.handleBlurEmail}
-              ></Input>
-            </Item>
-            <Text style={styles.error}>{this.state.emailError}</Text>
-            <Item style={styles.item} floatingLabel iconRight>
-              <Label style={styles.label}>Password</Label>
-              <Input
-                autoCorrect={false}
-                secureTextEntry={true}
-                autoCapitalize="none"
-                onChangeText={password =>
-                  this.setState({ password, passwordError: "" })
-                }
-                onBlur={this.handleBlurPwd}
-              ></Input>
-            </Item>
-            <Text style={styles.error}>{this.state.passwordError}</Text>
-            <Text style={styles.error}>{this.state.loginError}</Text>
-          </Form>
-          <View>
-            <Loader loading={this.state.showLoading} />
-          </View>
-          <Button
-            style={styles.submit}
-            full
-            rounded
-            onPress={() => navigate("Signup")}
-          >
-            <Text>No account yet? Signup</Text>
-          </Button>
-          <Button
-            full
-            rounded
-            disabled={this.state.canSubmit === true ? false : true}
-            onPress={() => this.handleLogin()}
-          >
-            <Text>Log in</Text>
-          </Button>
-        </Container>
-      </>
+      <SafeAreaView style={styles.hideStatusBar}>
+        <Form style={styles.form}>
+          <Item style={styles.item} floatingLabel>
+            <Label style={styles.label}>Email</Label>
+            <Input
+              autoCorrect={false}
+              autoCapitalize="none"
+              onChangeText={email => this.setState({ email, emailError: "" })}
+              keyboardType="email-address"
+              onBlur={this.handleBlurEmail}
+            ></Input>
+          </Item>
+          <Text style={styles.error}>{this.state.emailError}</Text>
+          <Item style={styles.item} floatingLabel iconRight>
+            <Label style={styles.label}>Password</Label>
+            <Input
+              autoCorrect={false}
+              secureTextEntry={true}
+              autoCapitalize="none"
+              onChangeText={password =>
+                this.setState({ password, passwordError: "" })
+              }
+              onBlur={this.handleBlurPwd}
+            ></Input>
+          </Item>
+          <Text style={styles.error}>{this.state.passwordError}</Text>
+          <Text style={styles.error}>{this.state.loginError}</Text>
+        </Form>
+        <View>
+          <Loader loading={this.state.showLoading} />
+        </View>
+        <Button
+          style={styles.submit}
+          full
+          rounded
+          onPress={() => navigate("Signup")}
+        >
+          <Text>No account yet? Signup</Text>
+        </Button>
+        <Button
+          full
+          rounded
+          disabled={this.state.canSubmit === true ? false : true}
+          onPress={() => this.handleLogin()}
+        >
+          <Text>Log in</Text>
+        </Button>
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  hideStatusBar: {
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+  },
   error: {
     margin: 0,
     padding: 0,
