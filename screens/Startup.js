@@ -2,14 +2,15 @@ import React, { Component } from "react";
 import {
   Text,
   SafeAreaView,
-  Button,
   AsyncStorage,
   StyleSheet,
   Platform,
-  StatusBar
+  StatusBar,
+  Image,
+  View,
+  TouchableOpacity
 } from "react-native";
-import firebase from "../config/Firebase";
-import Loader from "./loader";
+import * as Font from "expo-font";
 
 class Startup extends Component {
   constructor() {
@@ -18,33 +19,12 @@ class Startup extends Component {
       email: "",
       password: "",
       showLoading: false,
-      userFound: false
+      userFound: false,
+      fontLoaded: false
     };
   }
   static navigationOptions = {
     header: null
-  };
-
-  handleLogin = async () => {
-    this.setState({ showLoading: true });
-    const { email, password } = this.state;
-    try {
-      const response = await firebase.loginWithEmail(email, password);
-      if (response.user.uid) {
-        this.setState({ userFound: true });
-      }
-      const userId = response.user.uid;
-      AsyncStorage.setItem("userId", JSON.stringify(userId));
-    } catch (error) {
-      console.log(error);
-      this.setState({ showLoading: false });
-    } finally {
-      if (this.state.userFound === true) {
-        this.setState({ showLoading: false });
-        const { navigate } = this.props.navigation;
-        navigate("Home");
-      }
-    }
   };
 
   componentDidMount() {
@@ -52,56 +32,42 @@ class Startup extends Component {
   }
 
   _retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem("userId");
-      if (value !== null) {
-        var currentId = value.substring(1, value.length - 1);
-        const currentUser = await firebase.getCurrentUserWithId(currentId);
-        let email, password, currentData;
-        currentUser.forEach(data => {
-          switch (data.key) {
-            case "email":
-              currentData = JSON.stringify(data);
-              email = currentData.substring(1, currentData.length - 1);
-              break;
-            case "password":
-              currentData = JSON.stringify(data);
-              password = currentData.substring(1, currentData.length - 1);
-              break;
-          }
-        });
-        this.setState({ email, password });
-        this.handleLogin();
-      }
-    } catch (error) {
-      console.log("error: ", error);
+    const value = await AsyncStorage.getItem("userId");
+    if (value !== null) {
+      const { navigate } = this.props.navigation;
+      navigate("Loadprofile");
     }
+    await Font.loadAsync({
+      "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf"),
+      "Customfont-Bold": require("../assets/fonts/Customfont-Bold.ttf")
+    });
+    this.setState({ fontLoaded: true });
   };
 
   render() {
     const { navigate } = this.props.navigation;
-    return (
+    return this.state.fontLoaded === false ? null : (
       <SafeAreaView style={styles.hideStatusBar}>
-        <Loader loading={this.state.showLoading} />
-        <Text>Personify - Personal assistant</Text>
-        <Button
-          full
-          title="login with email"
-          onPress={() => navigate("Login")}
-        ></Button>
-        <Button
-          full
-          title="login with facebook"
-          onPress={() => navigate("Login")}
-        ></Button>
-        <Button
-          full
-          title="login with google"
-          onPress={() => navigate("Login")}
-        ></Button>
-        <Text>
-          If you are still logged in, you will automaticaly be forwarded to the
-          app.
+        <Image
+          style={styles.title_image}
+          source={require("../assets/img/wizer_dark.png")}
+        ></Image>
+        <View>
+          <TouchableOpacity
+            style={[styles.big_button, styles.top_button]}
+            onPress={() => navigate("Login")}
+          >
+            <Text style={styles.button_text}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.big_button}
+            onPress={() => navigate("Signup")}
+          >
+            <Text style={styles.button_text}>Sign up</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.bottom_text}>
+          Join Wizer and make your planning easier and wiser than ever
         </Text>
       </SafeAreaView>
     );
@@ -109,7 +75,44 @@ class Startup extends Component {
 }
 const styles = StyleSheet.create({
   hideStatusBar: {
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingBottom: 50,
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  title_image: {
+    width: 250,
+    height: 150,
+    resizeMode: "contain",
+    paddingTop: 200
+  },
+  bottom_text: {
+    color: "#44234C",
+    fontSize: 17.5,
+    fontFamily: "Customfont-Regular",
+    textAlign: "center",
+    paddingHorizontal: 30
+  },
+  top_button: {
+    marginBottom: 25
+  },
+  big_button: {
+    borderWidth: 2,
+    borderColor: "#44234C",
+    borderRadius: 5,
+    width: 300,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 7.5,
+    paddingBottom: 12.5
+  },
+  button_text: {
+    color: "#44234C",
+    fontSize: 25,
+    fontFamily: "Customfont-Bold"
   }
 });
 export default Startup;

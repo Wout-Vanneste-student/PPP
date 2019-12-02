@@ -1,15 +1,12 @@
 export default {
   firebase: {
-    apiKey: "AIzaSyDZ6qQ8GNXzDZZvlSaAH1SzynRJYggKWx4",
-    authDomain: "personify-personal-assistant.firebaseapp.com",
-    databaseURL: "https://personify-personal-assistant.firebaseio.com",
-    projectId: "personify-personal-assistant",
-    storageBucket: "personify-personal-assistant.appspot.com",
-    messagingSenderId: "910409518320",
-    appId: "1:910409518320:web:d0c66d801b72500e3f8635",
-    measurementId: "G-Y9NJPLTYBS"
-  },
-  facebook: {
-    appId: "419173292362855"
+    apiKey: "AIzaSyCz5vD2knsD2q0O6dneAGmL4UO406MA1P8",
+    authDomain: "wizer-personal-assist.firebaseapp.com",
+    databaseURL: "https://wizer-personal-assist.firebaseio.com",
+    projectId: "wizer-personal-assist",
+    storageBucket: "wizer-personal-assist.appspot.com",
+    messagingSenderId: "233359428361",
+    appId: "1:233359428361:web:a8fcb2a0383b0cd31421d8",
+    measurementId: "G-1EV98E7P5F"
   }
 };

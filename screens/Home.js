@@ -6,9 +6,13 @@ import {
   Button,
   Platform,
   StatusBar,
-  StyleSheet
+  StyleSheet,
+  AsyncStorage
 } from "react-native";
+import { Notifications } from "expo";
+import * as Permissions from "expo-permissions";
 import firebase from "../config/Firebase";
+import Firebase from "../config/Firebase";
 
 class Home extends Component {
   constructor() {
@@ -20,17 +24,45 @@ class Home extends Component {
   static navigationOptions = {
     header: null
   };
-  async componentDidMount() {
-    this.currentUserId = await firebase.getCurrentUserId();
-    this.currentUserName = await firebase.getCurrentUserName(
-      this.currentUserId
+
+  registerForPushNotificationsAsync = async () => {
+    const { status: existingStatus } = await Permissions.getAsync(
+      Permissions.NOTIFICATIONS
     );
-    const username = (email = JSON.stringify(this.currentUserName).substring(
-      1,
-      JSON.stringify(this.currentUserName).length - 1
-    ));
-    this.setState({ username });
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      return;
+    }
+    try {
+      this.currentUserToken = await Notifications.getExpoPushTokenAsync();
+      this.currentUserId = await Firebase.getCurrentUserId();
+
+      firebase.addPushToken(this.currentUserToken, this.currentUserId);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+
+  async componentDidMount() {
+    this._retrieveData();
+    await this.registerForPushNotificationsAsync();
   }
+
+  _retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("userName");
+      if (value !== null) {
+        this.setState({ username: value });
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+
   render() {
     const { navigate } = this.props.navigation;
     return (
@@ -40,7 +72,7 @@ class Home extends Component {
         </View>
         <Button title="Profile" onPress={() => navigate("Profile")} />
         <View>
-          <Text>Welcome {this.state.username}!</Text>
+          <Text>Hi {this.state.username}, enjoy this day!</Text>
         </View>
       </SafeAreaView>
     );

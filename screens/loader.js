@@ -19,7 +19,7 @@ const Loader = props => {
         console.log("close modal");
       }}
     >
-      <SafeAreaView>
+      <SafeAreaView style={styles.container}>
         <View style={styles.activityIndicatorWrapper}>
           <ActivityIndicator animating={loading} />
         </View>
@@ -29,6 +29,11 @@ const Loader = props => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "space-around"
+  },
   modalBackground: {
     flex: 1,
     alignItems: "center",

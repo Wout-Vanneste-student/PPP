@@ -2,8 +2,7 @@ import * as firebase from "firebase";
 import "firebase/auth";
 import "firebase/firestore";
 import firebaseConfig from "./firebaseConfig";
-import Expo from "expo";
-import { Facebook } from "expo-facebook";
+// import Expo from "expo";
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig.firebase);

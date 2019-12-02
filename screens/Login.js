@@ -7,12 +7,14 @@ import {
   AsyncStorage,
   Platform,
   StatusBar,
-  SafeAreaView
+  SafeAreaView,
+  Image,
+  TouchableOpacity,
+  TextInput
 } from "react-native";
-import { Container, Form, Input, Item, Button, Label } from "native-base";
 import firebase from "../config/Firebase";
 import _ from "lodash";
-import Loader from "./loader";
+import * as Font from "expo-font";
 
 /* This is to hide warnings about setting a timer */
 YellowBox.ignoreWarnings(["Setting a timer"]);
@@ -28,15 +30,17 @@ class Login extends Component {
   constructor() {
     super();
     this.state = {
+      userFound: false,
+      canSubmit: false,
       email: "",
       password: "",
       loginError: "",
       emailError: "",
       passwordError: "",
-      canSubmit: false,
-      userFound: false,
-      showLoading: false,
-      currentUser: ""
+      isEmailError: true,
+      isPasswordError: true,
+      fontLoaded: false,
+      hidePassword: true
     };
   }
 
@@ -44,8 +48,19 @@ class Login extends Component {
     header: null
   };
 
+  componentDidMount() {
+    this._retrieveData();
+  }
+
+  _retrieveData = async () => {
+    await Font.loadAsync({
+      "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf"),
+      "Customfont-Italic": require("../assets/fonts/Customfont-Italic.ttf")
+    });
+    this.setState({ fontLoaded: true });
+  };
+
   handleLogin = async () => {
-    this.setState({ showLoading: true });
     const { email, password } = this.state;
     try {
       const response = await firebase.loginWithEmail(email, password);
@@ -61,20 +76,18 @@ class Login extends Component {
       */
       console.log(error);
       this.setState({
-        loginError: error.message,
-        showLoading: false,
+        loginError: "No user found, your email or password was incorrect.",
         canSubmit: false
       });
     } finally {
       if (this.state.userFound === true) {
-        this.setState({ showLoading: false });
         const { navigate } = this.props.navigation;
         navigate("Home");
       }
     }
   };
 
-  handleBlurEmail = () => {
+  handleCheckEmail = () => {
     const email = this.state.email;
     if (this.state.email.length === 0) {
       this.setState({
@@ -84,7 +97,15 @@ class Login extends Component {
     } else {
       let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
       if (reg.test(email) === true) {
-        this.setState({ canSubmit: true });
+        this.setState({ isEmailError: false });
+        if (
+          this.state.passwordError === "" &&
+          this.state.isPasswordError === false
+        ) {
+          this.setState({ canSubmit: true });
+        } else {
+          this.setState({ canSubmit: false });
+        }
       } else {
         this.setState({
           canSubmit: false,
@@ -94,11 +115,7 @@ class Login extends Component {
     }
   };
 
-  handleBlurPassword = () => {
-    if (this.state.email.length > 0 && this.state.password.length > 0) {
-      this.setState({ canSubmit: true });
-    }
-
+  handleCheckPassword = () => {
     if (this.state.password.length === 0) {
       this.setState({
         canSubmit: false,
@@ -110,62 +127,86 @@ class Login extends Component {
         passwordError: "Please enter a valid password."
       });
     } else {
-      this.setState({
-        canSubmit: true
-      });
+      this.setState({ isPasswordError: false });
+      if (this.state.emailError === "" && this.state.isEmailError === false) {
+        this.setState({ canSubmit: true });
+      } else {
+        this.setState({ canSubmit: false });
+      }
     }
   };
 
   render() {
     const { navigate } = this.props.navigation;
-    return (
+    return this.state.fontLoaded === false ? null : (
       <SafeAreaView style={styles.hideStatusBar}>
-        <Form style={styles.form}>
-          <Item style={styles.item} floatingLabel>
-            <Label style={styles.label}>Email</Label>
-            <Input
-              autoCorrect={false}
-              autoCapitalize="none"
-              onChangeText={email => this.setState({ email, emailError: "" })}
+        <View style={styles.form}>
+          <Image
+            style={styles.title_image}
+            source={require("../assets/img/wizer_dark.png")}
+          ></Image>
+          <View>
+            <Text style={styles.inputLabel}>Email</Text>
+            <TextInput
+              style={styles.textInput}
+              onEndEditing={() => this.handleCheckEmail()}
               keyboardType="email-address"
-              onBlur={this.handleBlurEmail}
-            ></Input>
-          </Item>
-          <Text style={styles.error}>{this.state.emailError}</Text>
-          <Item style={styles.item} floatingLabel iconRight>
-            <Label style={styles.label}>Password</Label>
-            <Input
               autoCorrect={false}
-              secureTextEntry={true}
               autoCapitalize="none"
-              onChangeText={password =>
-                this.setState({ password, passwordError: "" })
+              value={this.state.email}
+              onChangeText={email =>
+                this.setState({ email, emailError: "", loginError: "" })
               }
-              onBlur={this.handleBlurPwd}
-            ></Input>
-          </Item>
-          <Text style={styles.error}>{this.state.passwordError}</Text>
-          <Text style={styles.error}>{this.state.loginError}</Text>
-        </Form>
-        <View>
-          <Loader loading={this.state.showLoading} />
+            ></TextInput>
+            <Text style={styles.inputHelp}>Example: john@company.com</Text>
+            <Text style={styles.inputError}>{this.state.emailError}</Text>
+          </View>
+          <View>
+            <Text style={styles.inputLabel}>Password</Text>
+            <TextInput
+              style={styles.textInput}
+              onEndEditing={() => this.handleCheckPassword()}
+              secureTextEntry={this.state.hidePassword}
+              autoCorrect={false}
+              autoCapitalize="none"
+              value={this.state.password}
+              onChangeText={password =>
+                this.setState({ password, passwordError: "", loginError: "" })
+              }
+            ></TextInput>
+            <TouchableOpacity
+              style={styles.hideShowPassword}
+              onPress={() =>
+                this.setState({ hidePassword: !this.state.hidePassword })
+              }
+            >
+              <Image
+                source={
+                  this.state.hidePassword
+                    ? require("../assets/img/hide.png")
+                    : require("../assets/img/show.png")
+                }
+                style={styles.hideShowPasswordImg}
+              />
+            </TouchableOpacity>
+            <Text style={styles.inputHelp}>
+              6+ character, capitals and numbers required
+            </Text>
+            <Text style={styles.inputError}>{this.state.passwordError}</Text>
+          </View>
+          <Text style={styles.inputError}>{this.state.loginError}</Text>
         </View>
-        <Button
-          style={styles.submit}
-          full
-          rounded
-          onPress={() => navigate("Signup")}
-        >
-          <Text>No account yet? Signup</Text>
-        </Button>
-        <Button
-          full
-          rounded
-          disabled={this.state.canSubmit === true ? false : true}
+        <TouchableOpacity
+          style={
+            this.state.canSubmit
+              ? styles.big_button
+              : { ...styles.big_button, ...styles.buttonDisabled }
+          }
           onPress={() => this.handleLogin()}
+          disabled={this.state.canSubmit ? false : true}
         >
-          <Text>Log in</Text>
-        </Button>
+          <Text style={styles.button_text}>Login</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
@@ -173,34 +214,84 @@ class Login extends Component {
 
 const styles = StyleSheet.create({
   hideStatusBar: {
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingBottom: 50,
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between"
   },
-  error: {
-    margin: 0,
-    padding: 0,
+  inputError: {
     color: "red",
+    fontFamily: "Customfont-Regular"
+  },
+  textInput: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#44234C",
+    width: 300,
+    marginTop: 10,
+    fontSize: 17.5,
+    fontFamily: "Customfont-Regular"
+  },
+  inputHelp: {
+    fontFamily: "Customfont-Italic",
+    color: "#5B5B5B",
     marginTop: 5
   },
-  item: {
-    marginLeft: 0,
-    paddingLeft: 0,
-    marginRight: 0,
-    paddingRight: 0
+  inputLabel: {
+    fontFamily: "Customfont-Regular",
+    color: "#44234C",
+    fontSize: 25
+  },
+  title_image: {
+    width: 150,
+    height: 75,
+    resizeMode: "contain",
+    paddingTop: 100
+  },
+  big_button: {
+    borderWidth: 2,
+    borderColor: "#44234C",
+    borderRadius: 5,
+    width: 300,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 7.5,
+    paddingBottom: 12.5
+  },
+  buttonDisabled: {
+    opacity: 0.2
+  },
+  button_text: {
+    color: "#44234C",
+    fontSize: 25,
+    fontFamily: "Customfont-Bold"
   },
   form: {
-    marginLeft: 10,
-    paddingLeft: 10,
-    marginRight: 10,
-    paddingRight: 10
-  },
-  submit: {
-    backgroundColor: "yellow"
-  },
-  container: {
+    width: 300,
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
-    margin: "auto"
+    justifyContent: "space-between"
+  },
+  hideShowPassword: {
+    position: "absolute",
+    right: 3,
+    bottom: 50,
+    height: 40,
+    width: 35,
+    padding: 2
+  },
+  hideShowPasswordImg: {
+    resizeMode: "contain",
+    height: "100%",
+    width: "100%"
+  },
+  cannotSubmit: {
+    opacity: 0.25
+  },
+  canSubmit: {
+    opacity: 1
   }
 });
 

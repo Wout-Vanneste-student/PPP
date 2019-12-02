@@ -5,12 +5,15 @@ import {
   View,
   Platform,
   StatusBar,
-  SafeAreaView
+  SafeAreaView,
+  AsyncStorage,
+  Image,
+  TouchableOpacity,
+  TextInput
 } from "react-native";
-import { Container, Form, Input, Item, Button, Label } from "native-base";
 import firebase from "../config/Firebase";
 import _ from "lodash";
-import Loader from "./loader";
+import * as Font from "expo-font";
 
 /* This is to hide warnings about setting a timer */
 // YellowBox.ignoreWarnings(["Setting a timer"]);
@@ -32,15 +35,17 @@ class Signup extends Component {
       emailError: "",
       passwordError: "",
       password2Error: "",
-      emailGood: false,
-      passwordGood: false,
-      password2Good: false,
+      emailGood: "",
+      passwordGood: "",
+      password2Good: "",
       canSubmit: false,
-      showLoading: false,
       userFound: false,
       userName: "",
-      userNameGood: false,
-      userNameError: ""
+      userNameGood: "",
+      userNameError: "",
+      hidePassword: true,
+      hideRepeatPassword: true,
+      fontLoaded: false
     };
   }
 
@@ -48,7 +53,19 @@ class Signup extends Component {
     header: null
   };
 
-  handleBlurEmail = () => {
+  componentDidMount() {
+    this._retrieveData();
+  }
+
+  _retrieveData = async () => {
+    await Font.loadAsync({
+      "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf"),
+      "Customfont-Italic": require("../assets/fonts/Customfont-Italic.ttf")
+    });
+    this.setState({ fontLoaded: true });
+  };
+
+  handleCheckEmail = () => {
     const email = this.state.email;
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (reg.test(email) === false) {
@@ -57,11 +74,11 @@ class Signup extends Component {
         emailGood: false
       });
     } else {
-      this.setState({ emailGood: true });
+      this.setState({ emailGood: "Almost as cool as ours." });
       if (
-        this.state.userNameGood === true &&
-        this.state.passwordGood === true &&
-        this.state.password2Good === true
+        this.state.userNameGood !== "" &&
+        this.state.passwordGood !== "" &&
+        this.state.password2Good !== ""
       ) {
         this.setState({ canSubmit: true });
       } else {
@@ -70,7 +87,7 @@ class Signup extends Component {
     }
   };
 
-  handleBlurPassword = () => {
+  handleCheckPassword = () => {
     const pwd = this.state.password;
     let hasLowerCase = false;
     let hasUpperCase = false;
@@ -102,11 +119,11 @@ class Signup extends Component {
         passwordGood: false
       });
     } else {
-      this.setState({ passwordGood: true });
+      this.setState({ passwordGood: "Good password!" });
       if (
-        this.state.emailGood === true &&
-        this.state.userNameGood === true &&
-        this.state.password2Good === true
+        this.state.emailGood !== "" &&
+        this.state.userNameGood !== "" &&
+        this.state.password2Good !== ""
       ) {
         this.setState({ canSubmit: true });
       } else {
@@ -118,7 +135,7 @@ class Signup extends Component {
     }
   };
 
-  handleBlurPassword2 = () => {
+  handleCheckPassword2 = () => {
     const { password, password2 } = this.state;
     if (password != password2) {
       this.setState({
@@ -126,11 +143,11 @@ class Signup extends Component {
         password2Good: false
       });
     } else {
-      this.setState({ password2Good: true });
+      this.setState({ password2Good: "Great match" });
       if (
-        this.state.emailGood === true &&
-        this.state.passwordGood === true &&
-        this.state.userNameGood === true
+        this.state.emailGood !== "" &&
+        this.state.passwordGood !== "" &&
+        this.state.userNameGood !== ""
       ) {
         this.setState({ canSubmit: true });
       } else {
@@ -139,14 +156,14 @@ class Signup extends Component {
     }
   };
 
-  handleBluruserName = () => {
+  handleCheckuserName = () => {
     const name = this.state.userName;
     if (name.length >= 3) {
-      this.setState({ userNameGood: true });
+      this.setState({ userNameGood: "We already like your name" });
       if (
-        this.state.emailGood === true &&
-        this.state.passwordGood === true &&
-        this.state.password2Good === true
+        this.state.emailGood !== "" &&
+        this.state.passwordGood !== "" &&
+        this.state.password2Good !== ""
       ) {
         this.setState({ canSubmit: true });
       } else {
@@ -159,145 +176,174 @@ class Signup extends Component {
     }
   };
 
-  handleSubmit = async (email, password) => {
-    this.handleBluruserName();
-    this.handleBlurPassword();
-    this.handleBlurPassword2();
-    this.handleBlurEmail();
-    const {
-      emailError,
-      passwordError,
-      password2Error,
-      userNameError
-    } = this.state;
-    if (
-      emailError === "" &&
-      passwordError === "" &&
-      password2Error === "" &&
-      userNameError === ""
-    ) {
-      this.setState({ showLoading: true });
-      try {
-        const response = await firebase.signupWithEmail(email, password);
-        if (response.user.uid) {
-          this.setState({ userFound: true });
-          const { uid } = response.user;
-          const username = this.state.userName;
-          let userData = { email, password, uid };
-          await firebase.createNewUser(userData);
-          userData = { username, email, password, uid };
-          await firebase.addUserData(uid, userData);
-        }
-      } catch (error) {
-        console.log(error.message);
-      } finally {
-        if (this.state.userFound === true) {
-          this.setState({ showLoading: false });
-          const { navigate } = this.props.navigation;
-          navigate("Home");
-        }
-      }
-    }
+  handleSubmit = async () => {
+    const { email, password, userName } = this.state;
+    AsyncStorage.setItem("SIGNUP_userName", userName);
+    AsyncStorage.setItem("SIGNUP_email", email);
+    AsyncStorage.setItem("SIGNUP_password", password);
+    const { navigate } = this.props.navigation;
+    navigate("Signuploading");
   };
 
   render() {
-    const { navigate } = this.props.navigation;
-    return (
+    return this.state.fontLoaded === false ? null : (
       <SafeAreaView style={styles.hideStatusBar}>
-        <Form style={styles.form}>
-          <Item
-            style={styles.item}
-            error={this.state.userNameError.length > 0 ? true : false}
-            success={this.state.userNameGood === true ? true : false}
-            floatingLabel
-          >
-            <Label style={styles.label}>Username</Label>
-            <Input
+        <View style={styles.form}>
+          <Image
+            style={styles.title_image}
+            source={require("../assets/img/wizer_dark.png")}
+          ></Image>
+          <View>
+            <Text style={styles.inputLabel}>Username</Text>
+            <TextInput
+              style={styles.textInput}
+              onEndEditing={() => this.handleCheckuserName()}
               autoCorrect={false}
-              autoCapitalize="none"
+              autoCapitalize="words"
+              value={this.state.userName}
               onChangeText={userName =>
                 this.setState({ userName, userNameError: "" })
               }
-              onBlur={this.handleBluruserName}
-            ></Input>
-          </Item>
-          <Text style={styles.error}>{this.state.userNameError}</Text>
-          <Item
-            style={styles.item}
-            error={this.state.emailError.length > 0 ? true : false}
-            success={this.state.emailGood === true ? true : false}
-            floatingLabel
-          >
-            <Label style={styles.label}>Email</Label>
-            <Input
-              autoCorrect={false}
-              autoCapitalize="none"
-              onChangeText={email => this.setState({ email, emailError: "" })}
+            ></TextInput>
+            <Text style={styles.inputHelp}>
+              We'll call you by your username
+            </Text>
+            <Text
+              style={
+                this.state.userNameError !== ""
+                  ? styles.inputError
+                  : styles.inputGood
+              }
+            >
+              {this.state.userNameError !== ""
+                ? this.state.userNameError
+                : this.state.userNameGood}
+            </Text>
+          </View>
+          <View>
+            <Text style={styles.inputLabel}>Email</Text>
+            <TextInput
+              style={styles.textInput}
+              onEndEditing={() => this.handleCheckEmail()}
               keyboardType="email-address"
-              onBlur={this.handleBlurEmail}
-            ></Input>
-          </Item>
-          <Text style={styles.error}>{this.state.emailError}</Text>
-          <Item
-            style={styles.item}
-            floatingLabel
-            iconRight
-            error={this.state.passwordError.length > 0 ? true : false}
-            success={this.state.passwordGood === true ? true : false}
-          >
-            <Label style={styles.label}>Password</Label>
-            <Input
               autoCorrect={false}
-              secureTextEntry={true}
               autoCapitalize="none"
+              value={this.state.email}
+              onChangeText={email => this.setState({ email, emailError: "" })}
+            ></TextInput>
+            <Text style={styles.inputHelp}>Example: john@company.com</Text>
+            <Text
+              style={
+                this.state.emailError !== ""
+                  ? styles.inputError
+                  : styles.inputGood
+              }
+            >
+              {this.state.emailError !== ""
+                ? this.state.emailError
+                : this.state.emailGood}
+            </Text>
+          </View>
+          <View>
+            <Text style={styles.inputLabel}>Password</Text>
+            <TextInput
+              style={styles.textInput}
+              onEndEditing={() => this.handleCheckPassword()}
+              autoCorrect={false}
+              autoCapitalize="none"
+              secureTextEntry={this.state.hidePassword}
+              value={this.state.password}
               onChangeText={password =>
                 this.setState({ password, passwordError: "" })
               }
-              onBlur={this.handleBlurPassword}
-            ></Input>
-          </Item>
-          <Text style={styles.error}>{this.state.passwordError}</Text>
-          <Item
-            style={styles.item}
-            floatingLabel
-            iconRight
-            error={this.state.password2Error.length > 0 ? true : false}
-            success={this.state.password2Good === true ? true : false}
-          >
-            <Label style={styles.label}>Repeat password</Label>
-            <Input
+            ></TextInput>
+            <TouchableOpacity
+              style={styles.hideShowPassword}
+              onPress={() =>
+                this.setState({ hidePassword: !this.state.hidePassword })
+              }
+            >
+              <Image
+                source={
+                  this.state.hidePassword
+                    ? require("../assets/img/hide.png")
+                    : require("../assets/img/show.png")
+                }
+                style={styles.hideShowPasswordImg}
+              />
+            </TouchableOpacity>
+            <Text style={styles.inputHelp}>
+              6+ character, capitals and numbers required
+            </Text>
+            <Text
+              style={
+                this.state.passwordError !== ""
+                  ? styles.inputError
+                  : styles.inputGood
+              }
+            >
+              {this.state.passwordError !== ""
+                ? this.state.passwordError
+                : this.state.passwordGood}
+            </Text>
+          </View>
+          <View>
+            <Text style={styles.inputLabel}>Repeat password</Text>
+            <TextInput
+              style={styles.textInput}
+              onEndEditing={() => this.handleCheckPassword2()}
               autoCorrect={false}
-              secureTextEntry={true}
               autoCapitalize="none"
+              secureTextEntry={this.state.hideRepeatPassword}
+              value={this.state.password2}
               onChangeText={password2 =>
                 this.setState({ password2, password2Error: "" })
               }
-              onBlur={this.handleBlurPassword2}
-            ></Input>
-          </Item>
-          <Text style={styles.error}>{this.state.password2Error}</Text>
-        </Form>
-        <View>
-          <Loader loading={this.state.showLoading === true ? true : false} />
+            ></TextInput>
+            <TouchableOpacity
+              style={styles.hideShowPassword}
+              onPress={() =>
+                this.setState({
+                  hideRepeatPassword: !this.state.hideRepeatPassword
+                })
+              }
+            >
+              <Image
+                source={
+                  this.state.hideRepeatPassword
+                    ? require("../assets/img/hide.png")
+                    : require("../assets/img/show.png")
+                }
+                style={styles.hideShowPasswordImg}
+              />
+            </TouchableOpacity>
+            <Text style={styles.inputHelp}>
+              Type that again just to make sure
+            </Text>
+            <Text
+              style={
+                this.state.password2Error !== ""
+                  ? styles.inputError
+                  : styles.inputGood
+              }
+            >
+              {this.state.password2Error
+                ? this.state.password2Error
+                : this.state.password2Good}
+            </Text>
+          </View>
         </View>
-        <Button
-          style={styles.submit}
-          full
-          rounded
-          onPress={() => navigate("Login")}
-        >
-          <Text>Already an account? Login</Text>
-        </Button>
-        <Button
-          full
-          rounded
-          disabled={this.state.canSubmit === true ? false : true}
-          onPress={() =>
-            this.handleSubmit(this.state.email, this.state.password)
+        <TouchableOpacity
+          onPress={() => this.handleSubmit()}
+          disabled={this.state.canSubmit ? false : true}
+          style={
+            this.state.canSubmit
+              ? styles.big_button
+              : { ...styles.big_button, ...styles.buttonDisabled }
           }
         >
-          <Text>Sign up!</Text>
-        </Button>
+          <Text style={styles.button_text}>Sign up</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
@@ -305,34 +351,91 @@ class Signup extends Component {
 
 const styles = StyleSheet.create({
   hideStatusBar: {
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingBottom: 50,
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between"
   },
-  error: {
-    margin: 0,
-    padding: 0,
+  inputError: {
     color: "red",
+    fontFamily: "Customfont-Regular"
+  },
+  inputGood: {
+    color: "green",
+    fontFamily: "Customfont-Regular"
+  },
+  textInput: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#44234C",
+    width: 300,
+    marginTop: 10,
+    fontSize: 17.5,
+    fontFamily: "Customfont-Regular"
+  },
+  inputHelp: {
+    fontFamily: "Customfont-Italic",
+    color: "#5B5B5B",
     marginTop: 5
   },
-  item: {
-    marginLeft: 0,
-    paddingLeft: 0,
-    marginRight: 0,
-    paddingRight: 0
+  inputLabel: {
+    fontFamily: "Customfont-Regular",
+    color: "#44234C",
+    fontSize: 25
+  },
+  title_image: {
+    width: 150,
+    height: 75,
+    resizeMode: "contain",
+    paddingTop: 100
+  },
+  big_button: {
+    borderWidth: 2,
+    borderColor: "#44234C",
+    borderRadius: 5,
+    width: 300,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 7.5,
+    paddingBottom: 12.5
+  },
+  buttonDisabled: {
+    opacity: 0.2
+  },
+  button_text: {
+    color: "#44234C",
+    fontSize: 25,
+    fontFamily: "Customfont-Bold"
   },
   form: {
-    marginLeft: 10,
-    paddingLeft: 10,
-    marginRight: 10,
-    paddingRight: 10
-  },
-  submit: {
-    backgroundColor: "yellow"
-  },
-  container: {
+    width: 300,
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
-    margin: "auto"
+    justifyContent: "space-between"
+  },
+  hideShowPassword: {
+    position: "absolute",
+    right: 3,
+    top: 35,
+    height: 40,
+    width: 35,
+    padding: 2
+  },
+  hideShowPasswordImg: {
+    resizeMode: "contain",
+    height: "100%",
+    width: "100%"
+  },
+  cannotSubmit: {
+    opacity: 0.25
+  },
+  canSubmit: {
+    opacity: 1
+  },
+  notLastView: {
+    marginBottom: 25
   }
 });
 

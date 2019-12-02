@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Personify - Personal Assistant",
-    "slug": "personify",
-    "owner": "Wout Vanneste",
+    "name": "Wizer - Personal Assistant",
+    "slug": "wizer",
+    "owner": "",
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "platforms": ["ios", "android"],
@@ -23,18 +23,25 @@
     "ios": {
       "supportsTablet": true
     },
+    "android": {
+      "package": "com.woutvanneste.wizer",
+      "versionCode": 1,
+      "permissions": [""],
+      "icon": "./assets/icon.png"
+    },
     "extra": {
       "firebase": {
-        "apiKey": "AIzaSyDZ6qQ8GNXzDZZvlSaAH1SzynRJYggKWx4",
-        "authDomain": "personify-personal-assistant.firebaseapp.com",
-        "databaseURL": "https://personify-personal-assistant.firebaseio.com",
-        "projectId": "personify-personal-assistant",
-        "storageBucket": "bucket.appspot.com",
-        "messagingSenderId": "910409518320"
+        "apiKey": "AIzaSyCz5vD2knsD2q0O6dneAGmL4UO406MA1P8",
+        "authDomain": "wizer-personal-assist.firebaseapp.com",
+        "databaseURL": "https://wizer-personal-assist.firebaseio.com",
+        "projectId": "wizer-personal-assist",
+        "storageBucket": "wizer-personal-assist.appspot.com",
+        "messagingSenderId": "233359428361"
       },
       "facebook": {
         "appId": "419173292362855"
       }
-    }
+    },
+    "description": ""
   }
 }
