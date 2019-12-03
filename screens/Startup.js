@@ -32,11 +32,6 @@ class Startup extends Component {
   }
 
   _retrieveData = async () => {
-    const value = await AsyncStorage.getItem("userId");
-    if (value !== null) {
-      const { navigate } = this.props.navigation;
-      navigate("Loadprofile");
-    }
     await Font.loadAsync({
       "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf"),
       "Customfont-Bold": require("../assets/fonts/Customfont-Bold.ttf")

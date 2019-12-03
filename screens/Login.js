@@ -82,7 +82,7 @@ class Login extends Component {
     } finally {
       if (this.state.userFound === true) {
         const { navigate } = this.props.navigation;
-        navigate("Home");
+        navigate("Planning");
       }
     }
   };
@@ -137,7 +137,6 @@ class Login extends Component {
   };
 
   render() {
-    const { navigate } = this.props.navigation;
     return this.state.fontLoaded === false ? null : (
       <SafeAreaView style={styles.hideStatusBar}>
         <View style={styles.form}>

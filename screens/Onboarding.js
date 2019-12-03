@@ -47,9 +47,12 @@ class Onboarding extends Component {
 
   _retrieveData = async () => {
     const { navigate } = this.props.navigation;
-    const seen = await AsyncStorage.getItem("seenOnboaring");
-    if (seen !== null) {
+    const seen = await AsyncStorage.getItem("seenOnboarding");
+    const user = await AsyncStorage.getItem("userId");
+    if (seen !== null && user === null) {
       navigate("Startup");
+    } else if (seen !== null && user !== null) {
+      navigate("Loadprofile");
     }
     await Font.loadAsync({
       "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf")

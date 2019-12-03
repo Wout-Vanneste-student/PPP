@@ -13,18 +13,19 @@ import { CounterContainer } from "../plugins/counter";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 import firebase from "../config/Firebase";
-
-import { Form, Input, Container, Label, Item } from "native-base";
+import * as Font from "expo-font";
 class Profile extends Component {
   constructor() {
     super();
     this.state = {
       title: "",
-      message: ""
+      message: "",
+      fontLoaded: false
     };
   }
   static navigationOptions = {
-    header: null
+    header: null,
+    headerMode: "none"
   };
 
   registerForPushNotificationsAsync = async () => {
@@ -56,13 +57,22 @@ class Profile extends Component {
     }
   };
 
-  async componentDidMount() {
+  componentDidMount() {
+    this._retrieveData();
+  }
+
+  _retrieveData = async () => {
     this.currentUserId = await firebase.getCurrentUserId();
     this.currentUserName = await firebase.getCurrentUserName(
       this.currentUserId
     );
     await this.registerForPushNotificationsAsync();
-  }
+    await Font.loadAsync({
+      "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf"),
+      "Customfont-Italic": require("../assets/fonts/Customfont-Italic.ttf")
+    });
+    this.setState({ fontLoaded: true });
+  };
 
   sendNotification = () => {
     const { title, message } = this.state;
@@ -91,36 +101,17 @@ class Profile extends Component {
 
   render() {
     const { navigate } = this.props.navigation;
-    return (
+    return this.state.fontLoaded === false ? null : (
       <SafeAreaView style={styles.hideStatusBar}>
         <View>
           <Text>Profile page</Text>
-          <Button title="Home" onPress={() => navigate("Home")} />
+          <Button title="Planning" onPress={() => navigate("Planning")} />
           <CounterContainer />
-
           <Button
             title="send notification"
             onPress={() => this.sendNotification("penis", "is dik")}
           />
         </View>
-        <Form style={styles.form}>
-          <Item style={styles.item} floatingLabel>
-            <Label style={styles.label}>Title</Label>
-            <Input
-              autoCorrect={false}
-              autoCapitalize="none"
-              onChangeText={title => this.setState({ title })}
-            ></Input>
-          </Item>
-          <Item floatingLabel>
-            <Label>Message</Label>
-            <Input
-              autoCorrect={false}
-              autoCapitalize="none"
-              onChangeText={message => this.setState({ message })}
-            ></Input>
-          </Item>
-        </Form>
         <Button title="Log out" onPress={() => this.handleSignout()}></Button>
       </SafeAreaView>
     );

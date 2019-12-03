@@ -13,12 +13,14 @@ import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 import firebase from "../config/Firebase";
 import Firebase from "../config/Firebase";
+import * as Font from "expo-font";
 
-class Home extends Component {
+class Planning extends Component {
   constructor() {
     super();
     this.state = {
-      username: ""
+      username: "",
+      fontLoaded: false
     };
   }
   static navigationOptions = {
@@ -53,10 +55,24 @@ class Home extends Component {
   }
 
   _retrieveData = async () => {
+    await Font.loadAsync({
+      "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf"),
+      "Customfont-Italic": require("../assets/fonts/Customfont-Italic.ttf")
+    });
+    this.setState({ fontLoaded: true });
     try {
       const value = await AsyncStorage.getItem("userName");
       if (value !== null) {
         this.setState({ username: value });
+      } else {
+        const currentUserId = await firebase.getCurrentUserId();
+        const currentUserName = await firebase.getCurrentUserName(
+          currentUserId
+        );
+        const subThis = JSON.stringify(currentUserName);
+        const userName = subThis.substring(1, subThis.length - 1);
+        this.setState({ username: userName });
+        AsyncStorage.setItem("userName", userName);
       }
     } catch (error) {
       console.log("error: ", error);
@@ -65,10 +81,10 @@ class Home extends Component {
 
   render() {
     const { navigate } = this.props.navigation;
-    return (
+    return this.state.fontLoaded === false ? null : (
       <SafeAreaView style={styles.hideStatusBar}>
         <View>
-          <Text>Home page</Text>
+          <Text>Hi wout</Text>
         </View>
         <Button title="Profile" onPress={() => navigate("Profile")} />
         <View>
@@ -84,4 +100,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Home;
+export default Planning;

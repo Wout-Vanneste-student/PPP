@@ -68,7 +68,7 @@ class Loadprofile extends Component {
     } finally {
       if (this.state.userFound === true) {
         const { navigate } = this.props.navigation;
-        navigate("Home");
+        navigate("Planning");
       }
     }
   };

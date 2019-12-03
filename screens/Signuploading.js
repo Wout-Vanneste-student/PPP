@@ -60,7 +60,7 @@ class Signuploading extends Component {
           AsyncStorage.removeItem("SIGNUP_username");
           AsyncStorage.removeItem("SIGNUP_email");
           AsyncStorage.removeItem("SIGNUP_password");
-          navigate("Home");
+          navigate("Planning");
         }
       }
     }
