@@ -1,5 +1,6 @@
 import React from "React";
 import Planning from "../screens/Planning";
+import Addplanning from "../screens/Addplanning";
 import Onboarding from "../screens/Onboarding";
 import Startup from "../screens/Startup";
 import Login from "../screens/Login";
@@ -60,7 +61,7 @@ const TabNavigator = createBottomTabNavigator(
       },
       style: {
         height: 55,
-        borderTopWidth: 3,
+        borderTopWidth: 2,
         borderTopColor: "#44234C"
       }
     }
@@ -73,7 +74,11 @@ const MainNavigator = createStackNavigator({
   Login: { screen: Login },
   Signup: { screen: Signup },
   Profile: {
-    screen: TabNavigator
+    screen: TabNavigator,
+    navigationOptions: {
+      headerMode: "none",
+      header: null
+    }
   },
   Planning: {
     screen: TabNavigator,
@@ -83,7 +88,8 @@ const MainNavigator = createStackNavigator({
     }
   },
   Loadprofile: { screen: Loadprofile },
-  Signuploading: { screen: Signuploading }
+  Signuploading: { screen: Signuploading },
+  Addplanning: { screen: Addplanning }
 });
 
 const styles = StyleSheet.create({

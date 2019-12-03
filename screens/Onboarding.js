@@ -42,10 +42,10 @@ class Onboarding extends Component {
     header: null
   };
   componentDidMount() {
-    this._retrieveData();
+    this.retrieveData();
   }
 
-  _retrieveData = async () => {
+  retrieveData = async () => {
     const { navigate } = this.props.navigation;
     const seen = await AsyncStorage.getItem("seenOnboarding");
     const user = await AsyncStorage.getItem("userId");

@@ -20,7 +20,8 @@ class Profile extends Component {
     this.state = {
       title: "",
       message: "",
-      fontLoaded: false
+      fontLoaded: false,
+      userName: ""
     };
   }
   static navigationOptions = {
@@ -33,24 +34,15 @@ class Profile extends Component {
       Permissions.NOTIFICATIONS
     );
     let finalStatus = existingStatus;
-
-    // only ask if permissions have not already been determined, because
-    // iOS won't necessarily prompt the user a second time.
     if (existingStatus !== "granted") {
-      // Android remote notification permissions are granted during the app
-      // install, so this will only ask on iOS
       const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
       finalStatus = status;
     }
-
-    // Stop here if the user did not grant permissions
     if (finalStatus !== "granted") {
       return;
     }
     try {
-      // Get the token that uniquely identifies this device
       this.currentUserToken = await Notifications.getExpoPushTokenAsync();
-
       firebase.addPushToken(this.currentUserToken, this.currentUserId);
     } catch (error) {
       console.log(error);
@@ -58,10 +50,10 @@ class Profile extends Component {
   };
 
   componentDidMount() {
-    this._retrieveData();
+    this.retrieveData();
   }
 
-  _retrieveData = async () => {
+  retrieveData = async () => {
     this.currentUserId = await firebase.getCurrentUserId();
     this.currentUserName = await firebase.getCurrentUserName(
       this.currentUserId
@@ -72,6 +64,19 @@ class Profile extends Component {
       "Customfont-Italic": require("../assets/fonts/Customfont-Italic.ttf")
     });
     this.setState({ fontLoaded: true });
+    try {
+      const value = await AsyncStorage.getItem("userName");
+      if (value !== null) {
+        this.setState({ username: value });
+      } else {
+        const subThis = JSON.stringify(this.currentUserName);
+        const userName = subThis.substring(1, subThis.length - 1);
+        this.setState({ username: userName });
+        AsyncStorage.setItem("userName", userName);
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   sendNotification = () => {
@@ -120,7 +125,8 @@ class Profile extends Component {
 
 const styles = StyleSheet.create({
   hideStatusBar: {
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingBottom: 50
   },
   item: {
     marginLeft: 0,

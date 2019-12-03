@@ -5,10 +5,6 @@ import AppContainer from "./routes";
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      showOnboarding: true,
-      fontLoaded: false
-    };
   }
 
   render() {

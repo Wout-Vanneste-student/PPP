@@ -17,7 +17,8 @@ class Loadprofile extends Component {
     super();
     this.state = {
       fontLoaded: false,
-      userFound: false
+      userFound: false,
+      dataFound: false
     };
   }
   static navigationOptions = {
@@ -25,7 +26,7 @@ class Loadprofile extends Component {
   };
 
   componentDidMount() {
-    this._retrieveData();
+    this.retrieveData();
     this._logUserIn();
   }
 
@@ -34,6 +35,7 @@ class Loadprofile extends Component {
       const value = await AsyncStorage.getItem("userId");
       if (value !== null) {
         var currentId = value.substring(1, value.length - 1);
+        this.currentUserId = currentId;
         const currentUser = await firebase.getCurrentUserWithId(currentId);
         let email, password, currentData;
         currentUser.forEach(data => {
@@ -67,13 +69,31 @@ class Loadprofile extends Component {
       console.log("error: ", error);
     } finally {
       if (this.state.userFound === true) {
-        const { navigate } = this.props.navigation;
-        navigate("Planning");
+        this.loadUserdata();
       }
     }
   };
 
-  _retrieveData = async () => {
+  loadUserdata = async () => {
+    const dataList = [];
+    const data = await firebase.getPlanningUser(this.currentUserId);
+    data.forEach(item => {
+      const key = item.key;
+      const itemData = JSON.stringify(item);
+      const dataLength = itemData.length;
+      const time = itemData.substring(9, 19);
+      const title = itemData.substring(30, dataLength - 2);
+      const toAddItem = { key, time, title };
+      dataList.push(toAddItem);
+    });
+    AsyncStorage.setItem("userPlanning", JSON.stringify(dataList));
+    this.setState({ dataFound: true });
+    if (this.state.userFound === true && this.state.dataFound === true) {
+      const { navigate } = this.props.navigation;
+      navigate("Planning");
+    }
+  };
+  retrieveData = async () => {
     await Font.loadAsync({
       "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf")
     });

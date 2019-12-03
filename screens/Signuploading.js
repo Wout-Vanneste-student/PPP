@@ -28,7 +28,7 @@ class Signuploading extends Component {
   };
 
   componentDidMount() {
-    this._retrieveData();
+    this.retrieveData();
     this._signUserIn();
   }
 
@@ -66,7 +66,7 @@ class Signuploading extends Component {
     }
   };
 
-  _retrieveData = async () => {
+  retrieveData = async () => {
     await Font.loadAsync({
       "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf")
     });

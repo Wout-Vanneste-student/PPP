@@ -49,10 +49,10 @@ class Login extends Component {
   };
 
   componentDidMount() {
-    this._retrieveData();
+    this.retrieveData();
   }
 
-  _retrieveData = async () => {
+  retrieveData = async () => {
     await Font.loadAsync({
       "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf"),
       "Customfont-Italic": require("../assets/fonts/Customfont-Italic.ttf")
