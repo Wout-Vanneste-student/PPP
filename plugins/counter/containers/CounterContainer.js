@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import CountButton from "../components/CountButton";
 import { connect } from "react-redux";
 import { incrementCount, decrementCount } from "../actions/CounterAction";
-import { Text } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 
 class CounterContainer extends Component {
   handleBtnActionIncrement = () => {
@@ -17,11 +17,13 @@ class CounterContainer extends Component {
     const { count } = this.props;
     return (
       <>
-        <Text>Count: {count}</Text>
-        <CountButton
-          action={this.handleBtnActionIncrement}
-          ButtonTitle="add to counter"
-        />
+        <Text style={styles.countText}>Count: {count}</Text>
+        <View style={styles.topButton}>
+          <CountButton
+            action={this.handleBtnActionIncrement}
+            ButtonTitle="add to counter"
+          />
+        </View>
         <CountButton
           action={this.handleBtnActionDecrement}
           ButtonTitle="remove from counter"
@@ -47,5 +49,18 @@ const mapDispatchToProps = dispatch => {
     }
   };
 };
+
+const styles = StyleSheet.create({
+  topButton: {
+    marginBottom: 15
+  },
+  countText: {
+    color: "#44234C",
+    fontSize: 25,
+    fontFamily: "Customfont-Bold",
+    textAlign: "center",
+    marginBottom: 25
+  }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(CounterContainer);

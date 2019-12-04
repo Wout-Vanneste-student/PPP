@@ -6,14 +6,14 @@ import {
   Image,
   Platform,
   StatusBar,
-  StyleSheet,
   AsyncStorage,
+  StyleSheet,
   TouchableOpacity,
   ScrollView
 } from "react-native";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
-import Firebase from "../config/Firebase";
+import firebase from "../config/Firebase";
 import * as Font from "expo-font";
 
 class Planning extends Component {
@@ -42,8 +42,8 @@ class Planning extends Component {
     }
     try {
       this.currentUserToken = await Notifications.getExpoPushTokenAsync();
-      this.currentUserId = await Firebase.getCurrentUserId();
-      Firebase.addPushToken(this.currentUserToken, this.currentUserId);
+      this.currentUserId = await firebase.getCurrentUserId();
+      firebase.addPushToken(this.currentUserToken, this.currentUserId);
     } catch (error) {
       console.log("error: ", error);
     }
@@ -70,14 +70,15 @@ class Planning extends Component {
 
   reloadPlanningAfterRemove = async () => {
     const dataList = [];
-    const data = await Firebase.getPlanningUser(this.currentUserId);
+    const data = await firebase.getPlanningUser(this.currentUserId);
     data.forEach(item => {
       const key = item.key;
-      const itemData = JSON.stringify(item);
-      const dataLength = itemData.length;
-      const time = itemData.substring(9, 19);
-      const title = itemData.substring(30, dataLength - 2);
-      const toAddItem = { key, time, title };
+      const itemStringify = JSON.stringify(item);
+      const itemArray = JSON.parse(itemStringify);
+      const time = itemArray.time;
+      const title = itemArray.title;
+      const notification = itemArray.notification;
+      const toAddItem = { key, notification, time, title };
       dataList.push(toAddItem);
     });
     AsyncStorage.removeItem("userPlanning");
@@ -98,7 +99,7 @@ class Planning extends Component {
 
   handleRemovePlanningItem = async item => {
     await Notifications.cancelScheduledNotificationAsync(item.notification);
-    await Firebase.removePlanningItem(this.currentUserId, item.key);
+    await firebase.removePlanningItem(this.currentUserId, item.key);
     this.reloadPlanningAfterRemove();
   };
 
@@ -128,9 +129,11 @@ class Planning extends Component {
             </View>
           ) : (
             <>
-              <ScrollView style={{ height: "70%" }}>
+              <ScrollView
+                showsHorizontalScrollIndicator={false}
+                style={{ height: "70%" }}
+              >
                 <UserPlanning
-                  style={styles.userPlanning}
                   data={this.state.userPlanning}
                   handleRemovePlanningItem={this.handleRemovePlanningItem}
                 />
@@ -171,7 +174,9 @@ const UserPlanning = ({ data, handleRemovePlanningItem }) => {
             </TouchableOpacity>
             <View>
               <Text style={styles.planningDate}>{item.time}</Text>
-              <Text style={styles.planningText}>Task: {item.title}</Text>
+              <View style={{ flexShrink: 1 }}>
+                <Text style={styles.planningText}>{item.title}</Text>
+              </View>
             </View>
           </View>
         );
@@ -183,7 +188,7 @@ const UserPlanning = ({ data, handleRemovePlanningItem }) => {
 const styles = StyleSheet.create({
   hideStatusBar: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    paddingBottom: 50,
+    paddingBottom: 25,
     paddingHorizontal: 15,
     flex: 1,
     display: "flex",
@@ -193,7 +198,7 @@ const styles = StyleSheet.create({
     fontFamily: "Customfont-Italic",
     color: "#44234C",
     textAlign: "center",
-    marginVertical: 10
+    marginTop: 30
   },
   customfont: {
     fontFamily: "Customfont-Regular",
@@ -236,9 +241,12 @@ const styles = StyleSheet.create({
     fontFamily: "Customfont-Bold"
   },
   planningItem: {
-    marginBottom: 25,
+    marginBottom: 15,
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
+    borderBottomColor: "#788ADA",
+    paddingBottom: 15,
+    borderBottomWidth: 1
   },
   planningDate: {
     color: "#44234C",
@@ -247,13 +255,18 @@ const styles = StyleSheet.create({
   planningText: {
     color: "#44234C",
     fontFamily: "Customfont-Regular",
-    fontSize: 17.5
+    fontSize: 17.5,
+    flex: 1,
+    flexWrap: "wrap",
+    marginRight: 35
   },
   removeButton: {
     marginRight: 15,
     display: "flex",
+    flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "flex-start",
+    marginTop: 5
   },
   removeImage: {
     width: 22,

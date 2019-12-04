@@ -15,7 +15,6 @@ import {
 import * as Font from "expo-font";
 import firebase from "../config/Firebase";
 import { Notifications } from "expo";
-import * as Permissions from "expo-permissions";
 
 class Addplanning extends Component {
   constructor() {
@@ -183,6 +182,8 @@ class Addplanning extends Component {
           <View style={styles.firstInput}>
             <Text style={styles.inputLabel}>What do you want to plan?</Text>
             <TextInput
+              multiline={true}
+              textAlignVertical="top"
               style={styles.textInput}
               onEndEditing={this.handleCheckText}
               onChangeText={itemTitle => this.setState({ itemTitle })}
@@ -199,7 +200,7 @@ class Addplanning extends Component {
               format="YYYY-MM-DD"
               minDate={minDate}
               maxDate="2020-12-31"
-              iconSource={require("../assets/img/calendar.png")}
+              iconSource={require("../assets/img/icons/calendar.png")}
               customStyles={{
                 placeholderText: {
                   fontFamily: "Customfont-Regular",
@@ -230,7 +231,7 @@ class Addplanning extends Component {
             />
           </View>
         </View>
-        <Text style={styles.inputLabel}>
+        <Text style={styles.notificationText}>
           We'll send you a notification the day before (unless due date is
           tomorrow) and on the due date at 7:00 AM.
         </Text>
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   hideStatusBar: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     paddingBottom: 50,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     flex: 1,
     display: "flex",
     justifyContent: "space-between"
@@ -266,6 +267,12 @@ const styles = StyleSheet.create({
     fontFamily: "Customfont-Regular",
     color: "#44234C",
     fontSize: 15
+  },
+  notificationText: {
+    fontFamily: "Customfont-Italic",
+    color: "#44234C",
+    fontSize: 16,
+    textAlign: "center"
   },
   big_button: {
     borderWidth: 2,
@@ -290,7 +297,6 @@ const styles = StyleSheet.create({
   textInput: {
     borderBottomWidth: 2,
     borderBottomColor: "#44234C",
-    width: 300,
     marginTop: 10,
     fontSize: 17.5,
     fontFamily: "Customfont-Regular"

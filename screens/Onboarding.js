@@ -15,7 +15,7 @@ import {
 const slides = [
   {
     key: "onboarding1",
-    title: "Wizer todos",
+    title: "Wizer planning",
     text: "Keep track off everything on your planning",
     title_image: require("../assets/img/wizer_white.png"),
     image: require("../assets/img/todo.png"),
@@ -24,7 +24,7 @@ const slides = [
   {
     key: "onboarding2",
     title: "Wizer weather",
-    text: "Never be surprised by the weather on your appointments",
+    text: "Check the weather at any time, anywhere",
     title_image: require("../assets/img/wizer_white.png"),
     image: require("../assets/img/weather.png"),
     backgroundColor: "#44234C"

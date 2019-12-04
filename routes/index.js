@@ -8,6 +8,7 @@ import Loadprofile from "../screens/Loadprofile";
 import Signuploading from "../screens/Signuploading";
 import Signup from "../screens/Signup";
 import Profile from "../screens/Profile";
+import Weather from "../screens/Weather";
 
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
@@ -26,7 +27,23 @@ const TabNavigator = createBottomTabNavigator(
           return (
             <Image
               style={styles.tabIcon}
-              source={require("../assets/img/calendar.png")}
+              source={require("../assets/img/icons/calendar.png")}
+            ></Image>
+          );
+        }
+      }
+    },
+    Weather: {
+      screen: Weather,
+      navigationOptions: {
+        headerMode: "none",
+        header: null,
+        tabBarLabel: "Weather",
+        tabBarIcon: () => {
+          return (
+            <Image
+              style={styles.tabIcon}
+              source={require("../assets/img/icons/weatherIcon.png")}
             ></Image>
           );
         }
@@ -42,7 +59,7 @@ const TabNavigator = createBottomTabNavigator(
           return (
             <Image
               style={styles.tabIcon}
-              source={require("../assets/img/profile.png")}
+              source={require("../assets/img/icons/profile.png")}
             ></Image>
           );
         }
@@ -81,6 +98,13 @@ const MainNavigator = createStackNavigator({
     }
   },
   Planning: {
+    screen: TabNavigator,
+    navigationOptions: {
+      headerMode: "none",
+      header: null
+    }
+  },
+  Weather: {
     screen: TabNavigator,
     navigationOptions: {
       headerMode: "none",

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {
   Text,
   View,
-  Button,
+  TouchableOpacity,
   StyleSheet,
   AsyncStorage,
   Platform,
@@ -66,15 +66,17 @@ class Profile extends Component {
   };
 
   render() {
-    const { navigate } = this.props.navigation;
     return this.state.fontLoaded === false ? null : (
       <SafeAreaView style={styles.hideStatusBar}>
         <View>
-          <Text>Profile page</Text>
-          <Button title="Planning" onPress={() => navigate("Planning")} />
           <CounterContainer />
         </View>
-        <Button title="Log out" onPress={() => this.handleSignout()}></Button>
+        <TouchableOpacity
+          style={styles.big_button}
+          onPress={() => this.handleSignout()}
+        >
+          <Text style={styles.button_text}>Sign out</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
@@ -83,7 +85,26 @@ class Profile extends Component {
 const styles = StyleSheet.create({
   hideStatusBar: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    paddingBottom: 50
+    paddingBottom: 25,
+    flex: 1,
+    justifyContent: "space-between"
+  },
+  big_button: {
+    borderWidth: 2,
+    borderColor: "#44234C",
+    borderRadius: 5,
+    width: 300,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 5,
+    paddingBottom: 10,
+    alignSelf: "center"
+  },
+  button_text: {
+    color: "#44234C",
+    fontSize: 20,
+    fontFamily: "Customfont-Bold"
   },
   item: {
     marginLeft: 0,
