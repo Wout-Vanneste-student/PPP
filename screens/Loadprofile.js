@@ -79,11 +79,12 @@ class Loadprofile extends Component {
     const data = await firebase.getPlanningUser(this.currentUserId);
     data.forEach(item => {
       const key = item.key;
-      const itemData = JSON.stringify(item);
-      const dataLength = itemData.length;
-      const time = itemData.substring(9, 19);
-      const title = itemData.substring(30, dataLength - 2);
-      const toAddItem = { key, time, title };
+      const itemStringify = JSON.stringify(item);
+      const itemArray = JSON.parse(itemStringify);
+      const time = itemArray.time;
+      const title = itemArray.title;
+      const notification = itemArray.notification;
+      const toAddItem = { key, notification, time, title };
       dataList.push(toAddItem);
     });
     AsyncStorage.setItem("userPlanning", JSON.stringify(dataList));

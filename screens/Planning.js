@@ -97,6 +97,7 @@ class Planning extends Component {
   };
 
   handleRemovePlanningItem = async item => {
+    await Notifications.cancelScheduledNotificationAsync(item.notification);
     await Firebase.removePlanningItem(this.currentUserId, item.key);
     this.reloadPlanningAfterRemove();
   };
@@ -114,16 +115,31 @@ class Planning extends Component {
             ></Image>
             <Text style={styles.headerText}>Your planning</Text>
           </View>
-          <ScrollView style={{ height: "70%" }}>
-            <UserPlanning
-              style={styles.userPlanning}
-              data={this.state.userPlanning}
-              handleRemovePlanningItem={this.handleRemovePlanningItem}
-            />
-          </ScrollView>
-          <Text style={styles.planningHelp}>
-            You can scroll through your planning.
-          </Text>
+
+          {JSON.parse(this.state.userPlanning).length === 0 ? (
+            <View style={styles.imageView}>
+              <Image
+                source={require("../assets/img/free.png")}
+                style={styles.freeImg}
+              ></Image>
+              <Text style={styles.planningHelp}>
+                You're totally free, relax!
+              </Text>
+            </View>
+          ) : (
+            <>
+              <ScrollView style={{ height: "70%" }}>
+                <UserPlanning
+                  style={styles.userPlanning}
+                  data={this.state.userPlanning}
+                  handleRemovePlanningItem={this.handleRemovePlanningItem}
+                />
+              </ScrollView>
+              <Text style={styles.planningHelp}>
+                You can scroll through your planning.
+              </Text>
+            </>
+          )}
         </View>
         <TouchableOpacity
           style={styles.big_button}
@@ -148,7 +164,10 @@ const UserPlanning = ({ data, handleRemovePlanningItem }) => {
               style={styles.removeButton}
               onPress={() => handleRemovePlanningItem(item)}
             >
-              <Text>REM</Text>
+              <Image
+                style={styles.removeImage}
+                source={require("../assets/img/trashcan.png")}
+              ></Image>
             </TouchableOpacity>
             <View>
               <Text style={styles.planningDate}>{item.time}</Text>
@@ -204,8 +223,8 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 7.5,
-    paddingBottom: 12.5,
+    paddingTop: 5,
+    paddingBottom: 10,
     alignSelf: "center"
   },
   buttonDisabled: {
@@ -213,7 +232,7 @@ const styles = StyleSheet.create({
   },
   button_text: {
     color: "#44234C",
-    fontSize: 25,
+    fontSize: 20,
     fontFamily: "Customfont-Bold"
   },
   planningItem: {
@@ -231,9 +250,26 @@ const styles = StyleSheet.create({
     fontSize: 17.5
   },
   removeButton: {
-    borderColor: "red",
-    borderWidth: 1,
-    marginRight: 15
+    marginRight: 15,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  removeImage: {
+    width: 22,
+    height: 27.5,
+    resizeMode: "contain"
+  },
+  freeImg: {
+    width: 300,
+    height: 300,
+    resizeMode: "contain"
+  },
+  imageView: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 50
   }
 });
 

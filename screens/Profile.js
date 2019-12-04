@@ -10,8 +10,6 @@ import {
   SafeAreaView
 } from "react-native";
 import { CounterContainer } from "../plugins/counter";
-import { Notifications } from "expo";
-import * as Permissions from "expo-permissions";
 import firebase from "../config/Firebase";
 import * as Font from "expo-font";
 class Profile extends Component {
@@ -21,32 +19,13 @@ class Profile extends Component {
       title: "",
       message: "",
       fontLoaded: false,
-      userName: ""
+      userName: "",
+      expoPushToken: ""
     };
   }
   static navigationOptions = {
     header: null,
     headerMode: "none"
-  };
-
-  registerForPushNotificationsAsync = async () => {
-    const { status: existingStatus } = await Permissions.getAsync(
-      Permissions.NOTIFICATIONS
-    );
-    let finalStatus = existingStatus;
-    if (existingStatus !== "granted") {
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-      finalStatus = status;
-    }
-    if (finalStatus !== "granted") {
-      return;
-    }
-    try {
-      this.currentUserToken = await Notifications.getExpoPushTokenAsync();
-      firebase.addPushToken(this.currentUserToken, this.currentUserId);
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   componentDidMount() {
@@ -58,7 +37,6 @@ class Profile extends Component {
     this.currentUserName = await firebase.getCurrentUserName(
       this.currentUserId
     );
-    await this.registerForPushNotificationsAsync();
     await Font.loadAsync({
       "Customfont-Regular": require("../assets/fonts/Customfont-Regular.ttf"),
       "Customfont-Italic": require("../assets/fonts/Customfont-Italic.ttf")
@@ -79,23 +57,6 @@ class Profile extends Component {
     }
   };
 
-  sendNotification = () => {
-    const { title, message } = this.state;
-    fetch("https://exp.host/--/api/v2/push/send", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-type": "application/json"
-      },
-      body: JSON.stringify({
-        to: this.currentUserToken,
-        sound: "default",
-        title: title,
-        body: message
-      })
-    });
-  };
-
   handleSignout = async () => {
     const { navigate } = this.props.navigation;
     firebase
@@ -112,10 +73,6 @@ class Profile extends Component {
           <Text>Profile page</Text>
           <Button title="Planning" onPress={() => navigate("Planning")} />
           <CounterContainer />
-          <Button
-            title="send notification"
-            onPress={() => this.sendNotification("penis", "is dik")}
-          />
         </View>
         <Button title="Log out" onPress={() => this.handleSignout()}></Button>
       </SafeAreaView>

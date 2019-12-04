@@ -82,7 +82,7 @@ class Login extends Component {
     } finally {
       if (this.state.userFound === true) {
         const { navigate } = this.props.navigation;
-        navigate("Planning");
+        navigate("Loadprofile");
       }
     }
   };

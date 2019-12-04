@@ -14,6 +14,8 @@ import {
 } from "react-native";
 import * as Font from "expo-font";
 import firebase from "../config/Firebase";
+import { Notifications } from "expo";
+import * as Permissions from "expo-permissions";
 
 class Addplanning extends Component {
   constructor() {
@@ -33,10 +35,58 @@ class Addplanning extends Component {
     this.retrieveData();
   }
 
-  addPlanningItem = async () => {
+  scheduleNotification = async (date, body) => {
+    let sendSecondNot = false;
+    let currentDate = new Date(),
+      currentDay = "" + (currentDate.getDate() + 1);
+    if (currentDay.length < 2) currentDay = "0" + currentDay;
+    const parDate = date;
+    const parBody = body;
+    const year = parDate.substring(0, 4);
+    const month = parDate.substring(5, 7);
+    const day = parDate.substring(8, 10);
+
+    if (currentDay !== day) {
+      sendSecondNot = true;
+    }
+
+    const notifDate = new Date(year, month - 1, day, "07", "00");
+
+    const schedulingOptions = {
+      time: notifDate.getTime()
+    };
+
+    const localNotification = {
+      title: "Planned for today",
+      body: parBody
+    };
+
+    const response1 = await Notifications.scheduleLocalNotificationAsync(
+      localNotification,
+      schedulingOptions
+    );
+    this.addNotificationId(response1);
+    if (sendSecondNot === true) {
+      // const secondDate = new Date(year, month - 1, day - 1, "07", "00");
+      // const secondSchedulingOptions = {
+      //   time: secondDate.getTime()
+      // };
+      // const secondLocalNotification = {
+      //   title: "Planned for tomorrow",
+      //   body: parBody
+      // };
+      // const response2 = await Notifications.scheduleLocalNotificationAsync(
+      //   secondLocalNotification,
+      //   secondSchedulingOptions
+      // );
+      // this.addNotificationId(response2);
+    }
+  };
+
+  addNotificationId = async notification => {
     const title = this.state.itemTitle;
     const time = this.state.itemTime;
-    const planningData = { title, time };
+    const planningData = { notification, title, time };
     this.currentUserId = await firebase.getCurrentUserId();
     try {
       const response = await firebase.addPlanningItem(
@@ -54,11 +104,12 @@ class Addplanning extends Component {
         const data = await firebase.getPlanningUser(this.currentUserId);
         data.forEach(item => {
           const key = item.key;
-          const itemData = JSON.stringify(item);
-          const dataLength = itemData.length;
-          const time = itemData.substring(9, 19);
-          const title = itemData.substring(30, dataLength - 2);
-          const toAddItem = { key, time, title };
+          const itemStringify = JSON.stringify(item);
+          const itemArray = JSON.parse(itemStringify);
+          const time = itemArray.time;
+          const title = itemArray.title;
+          const notification = itemArray.notification;
+          const toAddItem = { key, notification, time, title };
           dataList.push(toAddItem);
         });
         AsyncStorage.removeItem("userPlanning");
@@ -67,6 +118,12 @@ class Addplanning extends Component {
         navigate("Planning");
       }
     }
+  };
+
+  addPlanningItem = async () => {
+    const title = this.state.itemTitle;
+    const time = this.state.itemTime;
+    await this.scheduleNotification(time, title);
   };
 
   handleCheckText = () => {
@@ -97,6 +154,17 @@ class Addplanning extends Component {
 
   render() {
     const { navigate } = this.props.navigation;
+    var d = new Date(),
+      month = "" + (d.getMonth() + 1),
+      day = "" + (d.getDate() + 1),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    // You can only set something for the day after the current date
+    // As you need to receive a notification on the day of the due date at 7:00 AM
+    const minDate = [year, month, day].join("-");
 
     return (
       <SafeAreaView style={styles.hideStatusBar}>
@@ -129,7 +197,7 @@ class Addplanning extends Component {
               mode="date"
               placeholder="select date"
               format="YYYY-MM-DD"
-              minDate="2019-12-01"
+              minDate={minDate}
               maxDate="2020-12-31"
               iconSource={require("../assets/img/calendar.png")}
               customStyles={{
@@ -162,6 +230,10 @@ class Addplanning extends Component {
             />
           </View>
         </View>
+        <Text style={styles.inputLabel}>
+          We'll send you a notification the day before (unless due date is
+          tomorrow) and on the due date at 7:00 AM.
+        </Text>
         <TouchableOpacity
           style={
             this.state.canSubmit
