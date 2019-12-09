@@ -108,7 +108,8 @@ const styles = StyleSheet.create({
   bottom_text: {
     color: '#44234C',
     fontSize: 17.5,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     textAlign: 'center',
     paddingHorizontal: 30,
   },

@@ -57,9 +57,15 @@ class Planning extends Component {
       const key = item.key;
       const itemStringify = JSON.stringify(item);
       const itemArray = JSON.parse(itemStringify);
-      const time = itemArray.notifDate;
-      const title = itemArray.notifMessage;
-      const toAddItem = {key, time, title};
+      const notificationMessage = itemArray.notifMessage;
+      const notificationDate = itemArray.notifDate;
+      const notificationKey = itemArray.notifKey;
+      const toAddItem = {
+        key,
+        notificationMessage,
+        notificationDate,
+        notificationKey,
+      };
       dataList.push(toAddItem);
     });
     await AsyncStorage.removeItem('userPlanning');
@@ -72,7 +78,7 @@ class Planning extends Component {
   };
 
   handleRemovePlanningItem = async item => {
-    this.cancelNotif(this.state.userPlanning.indexOf(item));
+    this.cancelNotif(item.notificationKey);
 
     const currentUserId = await firebase.getCurrentUserId();
     await firebase.removePlanningItem(currentUserId, item.key);
@@ -131,11 +137,9 @@ class Planning extends Component {
 }
 
 const UserPlanning = ({data, handleRemovePlanningItem}) => {
-  const list = data;
-
   return (
     <>
-      {list.map((item, i) => {
+      {data.map((item, i) => {
         return (
           <View style={styles.planningItem} key={i}>
             <TouchableOpacity
@@ -147,12 +151,10 @@ const UserPlanning = ({data, handleRemovePlanningItem}) => {
               />
             </TouchableOpacity>
             <View>
-              <Text style={styles.planningDate}>
-                {item.itemDate ? item.itemDate : item.time}
-              </Text>
+              <Text style={styles.planningDate}>{item.notificationDate}</Text>
               <View style={styles.flexshrink}>
                 <Text style={styles.planningText}>
-                  {item.itemMessage ? item.itemMessage : item.title}
+                  {item.notificationMessage}
                 </Text>
               </View>
             </View>
@@ -176,17 +178,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   planningHelp: {
-    fontFamily: 'Customfont-Italic',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
     color: '#44234C',
     textAlign: 'center',
     marginTop: 30,
   },
   customfont: {
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     color: '#44234C',
   },
   headerText: {
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 25,
     color: '#44234C',
   },
@@ -219,7 +224,8 @@ const styles = StyleSheet.create({
   button_text: {
     color: '#44234C',
     fontSize: 20,
-    fontFamily: 'Customfont-Bold',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   planningItem: {
     marginBottom: 15,
@@ -231,11 +237,13 @@ const styles = StyleSheet.create({
   },
   planningDate: {
     color: '#44234C',
-    fontFamily: 'Customfont-Italic',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
   },
   planningText: {
     color: '#44234C',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 17.5,
     flex: 1,
     flexWrap: 'wrap',

@@ -26,14 +26,11 @@ class Addplanning extends Component {
       canSubmit: false,
       planningAdded: false,
       notifKeySet: false,
-      // senderID: firebaseConfig.firebase.senderId,
-
-      // gcmRegistered: false,
-      // registerToken: null,
-      notifDate: null,
+      notifDate: new Date(),
       mode: 'date',
       show: false,
-      minDate: new Date(new Date().setDate(new Date().getDate())),
+      // minDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      minDate: new Date(),
       selectedDateMinutes: null,
       selectedDateHours: null,
     };
@@ -46,8 +43,6 @@ class Addplanning extends Component {
   };
 
   scheduleNotif = async (date, message) => {
-    let uniqueKey;
-    // let alldatalist = [];
     let dd = date.getDate();
     let mm = date.getMonth() + 1;
     const yyyy = date.getFullYear();
@@ -70,15 +65,21 @@ class Addplanning extends Component {
     const notifDate = notifDateFormat + ' at ' + notifTimeFormat;
     const currentUserId = await firebase.getCurrentUserId();
     const notifMessage = this.state.notifMessage;
-    const emptyKey = '';
-    const planningData = {notifDate, notifMessage, emptyKey};
+    const notifKey = Math.floor(Math.random() * Math.floor(100000000));
+    const planningData = {
+      notifDate,
+      notifMessage,
+      notifKey,
+    };
     try {
       const response = await firebase.addPlanningItem(
         planningData,
         currentUserId,
       );
       if (response) {
-        this.setState({planningAdded: true});
+        this.setState({
+          planningAdded: true,
+        });
       }
     } catch (error) {
       console.log(error);
@@ -90,69 +91,67 @@ class Addplanning extends Component {
           const key = item.key;
           const itemStringify = JSON.stringify(item);
           const itemArray = JSON.parse(itemStringify);
-          const itemMessage = itemArray.notifMessage;
-          const itemDate = itemArray.notifDate;
-          const toAddItem = {key, itemDate, itemMessage};
+          const notificationMessage = itemArray.notifMessage;
+          const notificationDate = itemArray.notifDate;
+          const notificationKey = itemArray.notifKey;
+          const toAddItem = {
+            key,
+            notificationMessage,
+            notificationDate,
+            notificationKey,
+          };
           dataList.push(toAddItem);
         });
         AsyncStorage.removeItem('userPlanning');
         AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
-        const userPlanning = await AsyncStorage.getItem('userPlanning');
-        const userPlanningArray = JSON.parse(userPlanning);
-        // alldatalist = userPlanningArray;
-        const lastItem = userPlanningArray[userPlanningArray.length - 1];
-        const lastItemStringify = JSON.stringify(lastItem);
-        const lastItemParsed = JSON.parse(lastItemStringify);
-        uniqueKey = lastItemParsed.key;
-        await firebase.addKeyToItem(
-          uniqueKey,
-          notifDate,
-          notifMessage,
-          uniqueKey,
-          currentUserId,
-        );
       }
     }
-
-    const data = await AsyncStorage.getItem('userPlanning');
-    const parseData = JSON.parse(data);
     const roundSecondsDate = new Date(new Date(date).setSeconds(0));
-    this.notif.scheduleNotif(roundSecondsDate, message, parseData.length);
+    const test = JSON.stringify(notifKey);
+    this.notif.scheduleNotif(roundSecondsDate, message, test);
     const {navigate} = this.props.navigation;
     navigate('Planning');
   };
 
   handleCheckText = () => {
-    if (this.state.notifDate !== null) {
+    if (this.state.notifDate.getDate() !== null /*new Date().getDate()*/) {
       this.setState({canSubmit: true});
     } else {
       this.setState({canSubmit: false});
     }
+    this.setState({canSubmit: true});
   };
 
   setDate = (event, date) => {
-    date = date || this.state.notifDate;
-    let todayBelgianTime;
-    if (this.state.mode === 'time') {
-      todayBelgianTime = new Date(this.state.notifDate);
-      let hh = date.getHours();
-      let minmin = date.getMinutes();
-      this.setState({selectedDateHours: hh, selectedDateMinutes: minmin});
-      todayBelgianTime.setHours(hh);
-      todayBelgianTime.setMinutes(minmin);
+    if (Platform.OS === 'android') {
+      date = date || this.state.notifDate;
+      let todayBelgianTime;
+      if (this.state.mode === 'time') {
+        todayBelgianTime = new Date(this.state.notifDate);
+        let hh = date.getHours();
+        let minmin = date.getMinutes();
+        this.setState({selectedDateHours: hh, selectedDateMinutes: minmin});
+        todayBelgianTime.setHours(hh);
+        todayBelgianTime.setMinutes(minmin);
+      } else {
+        todayBelgianTime = new Date(date);
+      }
+      const selectedDate = new Date(todayBelgianTime);
+      if (this.state.mode === 'time') {
+        this.setState({mode: 'date'});
+      } else {
+        this.setState({mode: 'time'});
+      }
+      this.setState({
+        show: Platform.OS === 'ios' ? true : false,
+        notifDate: selectedDate,
+      });
     } else {
-      todayBelgianTime = new Date(date);
+      this.setState({
+        show: Platform.OS === 'ios' ? true : false,
+        notifDate: date,
+      });
     }
-    const selectedDate = new Date(todayBelgianTime);
-    if (this.state.mode === 'time') {
-      this.setState({mode: 'date'});
-    } else {
-      this.setState({mode: 'time'});
-    }
-    this.setState({
-      show: Platform.OS === 'ios' ? true : false,
-      notifDate: selectedDate,
-    });
     if (
       this.state.selectedDateMinutes !== null &&
       this.state.selectedDateHours !== null &&
@@ -177,11 +176,10 @@ class Addplanning extends Component {
     const {navigate} = this.props.navigation;
     const {show, minDate, notifDate, mode} = this.state;
     let notificationDate;
-    if (notifDate !== null) {
+    if (notifDate.getDate() !== null /*new Date().getDate()*/) {
       let dd = notifDate.getDate();
       let mm = notifDate.getMonth() + 1;
       const yyyy = notifDate.getFullYear();
-
       if (dd < 10) {
         dd = '0' + dd;
       }
@@ -189,7 +187,6 @@ class Addplanning extends Component {
         mm = '0' + mm;
       }
       const notifDateFormat = dd + '/' + mm + '/' + yyyy;
-
       let hh = notifDate.getHours();
       let minmin = notifDate.getMinutes();
       if (hh < 10) {
@@ -199,7 +196,6 @@ class Addplanning extends Component {
         minmin = '0' + minmin;
       }
       const notifTimeFormat = hh + ':' + minmin;
-
       notificationDate = notifDateFormat + ' at ' + notifTimeFormat;
     }
 
@@ -244,25 +240,23 @@ class Addplanning extends Component {
                     </Text>
                   </TouchableOpacity>
                 </View>
-                {show && (
-                  <DateTimePicker
-                    onChange={this.setDate}
-                    value={() => {
-                      if (notifDate === null) {
-                        minDate;
-                      } else {
-                        notifDate;
-                      }
-                    }}
-                    mode={mode}
-                    is24Hour={true}
-                    display="default"
-                    minimumDate={minDate}
-                  />
-                )}
+                {this.state.selectedDateHours !== null &&
+                this.state.selectedDateMinutes !== null
+                  ? null
+                  : show && (
+                      <DateTimePicker
+                        onChange={this.setDate}
+                        value={notifDate}
+                        mode={Platform.OS === 'android' ? mode : 'datetime'}
+                        is24Hour={true}
+                        display="default"
+                        minimumDate={minDate}
+                      />
+                    )}
               </View>
             </View>
-            {this.state.notifDate === null ? (
+            {this.state.notifDate.getDate() ===
+            null /*new Date().getDate()*/ ? (
               <Text style={styles.notificationText}>
                 We'll send you a notification
               </Text>
@@ -300,6 +294,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     flex: 1,
   },
+  iosDatePicker: {marginTop: 15},
   touchableWithoutFeedback: {
     paddingHorizontal: 20,
     flex: 1,
@@ -310,12 +305,14 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   inputLabel: {
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     color: '#44234C',
     fontSize: 15,
   },
   notificationText: {
-    fontFamily: 'Customfont-Italic',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
     color: '#44234C',
     fontSize: 16,
     textAlign: 'center',
@@ -338,18 +335,21 @@ const styles = StyleSheet.create({
   button_text: {
     color: '#44234C',
     fontSize: 25,
-    fontFamily: 'Customfont-Bold',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   textInput: {
     borderBottomWidth: 2,
     borderBottomColor: '#44234C',
     marginTop: 10,
     fontSize: 17.5,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   formTitle: {
     fontSize: 20,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     color: '#44234C',
     marginBottom: 15,
   },
@@ -359,7 +359,8 @@ const styles = StyleSheet.create({
   goBackText: {
     color: '#44234C',
     fontSize: 15,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     textAlign: 'right',
   },
   goBack: {

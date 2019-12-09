@@ -79,27 +79,51 @@ class Weather extends Component {
 
   retrieveData = async () => {
     let status = '';
-    await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
-      .then(async result => {
-        switch (result) {
-          case RESULTS.UNAVAILABLE:
-            status = 'UNAVAILABLE';
-            await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
-            break;
-          case RESULTS.DENIED:
-            await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
-            break;
-          case RESULTS.GRANTED:
-            status = 'GRANTED';
-            break;
-          case RESULTS.BLOCKED:
-            status = 'BLOCKED';
-            break;
-        }
-      })
-      .catch(error => {
-        console.log('permission error: ', error);
-      });
+    if (Platform.OS === 'android') {
+      await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+        .then(async result => {
+          switch (result) {
+            case RESULTS.UNAVAILABLE:
+              status = 'UNAVAILABLE';
+              await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+              break;
+            case RESULTS.DENIED:
+              await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+              break;
+            case RESULTS.GRANTED:
+              status = 'GRANTED';
+              break;
+            case RESULTS.BLOCKED:
+              status = 'BLOCKED';
+              break;
+          }
+        })
+        .catch(error => {
+          console.log('permission error: ', error);
+        });
+    } else {
+      await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
+        .then(async result => {
+          switch (result) {
+            case RESULTS.UNAVAILABLE:
+              status = 'UNAVAILABLE';
+              await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+              break;
+            case RESULTS.DENIED:
+              await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+              break;
+            case RESULTS.GRANTED:
+              status = 'GRANTED';
+              break;
+            case RESULTS.BLOCKED:
+              status = 'BLOCKED';
+              break;
+          }
+        })
+        .catch(error => {
+          console.log('permission error: ', error);
+        });
+    }
 
     if (status === 'GRANTED') {
       Geolocation.getCurrentPosition(
@@ -270,25 +294,29 @@ const styles = StyleSheet.create({
   tempText: {
     fontSize: 50,
     color: '#fff',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   loadingText: {
     fontSize: 25,
     color: '#fff',
     textAlign: 'center',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     marginBottom: 75,
     marginTop: 50,
   },
   title: {
     fontSize: 35,
     color: '#44234C',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   subtitle: {
     fontSize: 15,
     color: '#44234C',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   weatherImgBackground: {
     width: 300,

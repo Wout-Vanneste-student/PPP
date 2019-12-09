@@ -345,11 +345,13 @@ const styles = StyleSheet.create({
   },
   inputError: {
     color: 'red',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   inputGood: {
     color: 'green',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   textInput: {
     borderBottomWidth: 2,
@@ -357,15 +359,18 @@ const styles = StyleSheet.create({
     width: 300,
     marginTop: 10,
     fontSize: 17.5,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   inputHelp: {
-    fontFamily: 'Customfont-Italic',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
     color: '#5B5B5B',
     marginTop: 5,
   },
   inputLabel: {
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     color: '#44234C',
     fontSize: 25,
   },
@@ -393,7 +398,8 @@ const styles = StyleSheet.create({
   button_text: {
     color: '#44234C',
     fontSize: 25,
-    fontFamily: 'Customfont-Bold',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   form: {
     width: 300,

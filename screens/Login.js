@@ -126,7 +126,7 @@ class Login extends Component {
             style={styles.title_image}
             source={require('../assets/img/wizer_dark.png')}
           />
-          <View>
+          <View style={styles.testen}>
             <Text style={styles.inputLabel}>Email</Text>
             <TextInput
               style={styles.textInput}
@@ -142,7 +142,7 @@ class Login extends Component {
             <Text style={styles.inputHelp}>Example: john@company.com</Text>
             <Text style={styles.inputError}>{this.state.emailError}</Text>
           </View>
-          <View>
+          <View style={styles.testen}>
             <Text style={styles.inputLabel}>Password</Text>
             <TextInput
               style={styles.textInput}
@@ -176,22 +176,29 @@ class Login extends Component {
           </View>
           <Text style={styles.inputError}>{this.state.loginError}</Text>
         </View>
-        <TouchableOpacity
-          style={
-            this.state.canSubmit
-              ? styles.big_button
-              : {...styles.big_button, ...styles.buttonDisabled}
-          }
-          onPress={() => this.handleLogin()}
-          disabled={this.state.canSubmit ? false : true}>
-          <Text style={styles.button_text}>Login</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={
+              this.state.canSubmit
+                ? styles.big_button
+                : {...styles.big_button, ...styles.buttonDisabled}
+            }
+            onPress={() => this.handleLogin()}
+            disabled={this.state.canSubmit ? false : true}>
+            <Text style={styles.button_text}>Login</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  testen: {
+    width: '100%',
+    margin: 0,
+    padding: 0,
+  },
   hideStatusBar: {
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     paddingBottom: 50,
@@ -202,23 +209,27 @@ const styles = StyleSheet.create({
   },
   inputError: {
     color: 'red',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   textInput: {
     borderBottomWidth: 2,
     borderBottomColor: '#44234C',
-    width: 300,
+    // width: '100%',
     marginTop: 10,
     fontSize: 17.5,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   inputHelp: {
-    fontFamily: 'Customfont-Italic',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
     color: '#5B5B5B',
     marginTop: 5,
   },
   inputLabel: {
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     color: '#44234C',
     fontSize: 25,
   },
@@ -232,12 +243,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#44234C',
     borderRadius: 5,
-    width: 300,
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 7.5,
     paddingBottom: 12.5,
+  },
+  buttonContainer: {
+    paddingHorizontal: 20,
+    width: '100%',
   },
   buttonDisabled: {
     opacity: 0.2,
@@ -245,10 +260,12 @@ const styles = StyleSheet.create({
   button_text: {
     color: '#44234C',
     fontSize: 25,
-    fontFamily: 'Customfont-Bold',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   form: {
-    width: 300,
+    width: '100%',
+    paddingHorizontal: 20,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',

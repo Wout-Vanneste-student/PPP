@@ -7,7 +7,11 @@ import Signuploading from '../screens/Signuploading';
 import Signup from '../screens/Signup';
 import Profile from '../screens/Profile';
 import Extensions from '../screens/Extensions';
-import {Image, StyleSheet} from 'react-native';
+// Following screens shouldn't be imported as their components should be rendered as extensions.
+import Weather from '../screens/Weather';
+import Planning from '../screens/Planning';
+import Addplanning from '../screens/Addplanning';
+import {Image, StyleSheet, Platform} from 'react-native';
 
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
@@ -56,8 +60,10 @@ const TabNavigator = createBottomTabNavigator(
       labelStyle: {
         fontSize: 14,
         padding: 3,
-        fontFamily: 'Customfont-Regular',
+        fontFamily:
+          Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
       },
+      inactiveBackgroundColor: 'white',
       style: {
         height: 55,
         borderTopWidth: 2,
@@ -66,6 +72,7 @@ const TabNavigator = createBottomTabNavigator(
         borderTopColor: '#44234C',
         borderLeftColor: '#44234C',
         borderRightColor: '#44234C',
+        backgroundColor: '#44234C',
       },
     },
   },
@@ -92,6 +99,9 @@ const MainNavigator = createStackNavigator({
   },
   Loadprofile: {screen: Loadprofile},
   Signuploading: {screen: Signuploading},
+  Weather: {screen: Weather},
+  Planning: {screen: Planning},
+  Addplanning: {screen: Addplanning},
 });
 
 const styles = StyleSheet.create({

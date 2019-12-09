@@ -4,7 +4,6 @@ export default class NotifService {
   constructor(onRegister, onNotification) {
     this.configure(onRegister, onNotification);
   }
-
   configure(onRegister, onNotification, gcm = '') {
     PushNotification.configure({
       onRegister: onRegister,
@@ -19,32 +18,27 @@ export default class NotifService {
       requestPermissions: true,
     });
   }
-
   localNotif(message) {
     PushNotification.localNotification({
       message: message,
     });
   }
-
   scheduleNotif(notifTime, notifMessage, notifNumber) {
     PushNotification.localNotificationSchedule({
+      id: notifNumber,
       message: notifMessage,
       date: notifTime,
       userInfo: {id: notifNumber},
-      id: notifNumber,
     });
   }
-
   checkPermission(cbk) {
     return PushNotification.checkPermissions(cbk);
   }
-
   cancelNotif(number) {
     PushNotification.cancelLocalNotifications({
       id: number,
     });
   }
-
   cancelAll() {
     PushNotification.cancelAllLocalNotifications();
   }

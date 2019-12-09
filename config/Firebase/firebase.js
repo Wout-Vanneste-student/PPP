@@ -6,8 +6,39 @@ import firebaseConfig from './firebaseConfig';
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig.firebase);
 
+var provider = new firebase.auth.FacebookAuthProvider();
+
+provider.addScope('email, first_name');
+
+provider.setCustomParameters({display: 'popup'});
+
+firebase.auth().useDeviceLanguage();
+
 const Firebase = {
   // auth
+  loginWithFacebook: () => {
+    return firebase
+      .auth()
+      .signInWithPopup(provider)
+      .then(result => {
+        console.log('result: ', result);
+        // var token = result.credential.accessToken;
+        // console.log('token: ', token);
+        // var user = result.user;
+        // console.log('user: ', user);
+      })
+      .catch(error => {
+        console.log('error: ', error);
+        var errorCode = error.code;
+        console.log('errorCode: ', errorCode);
+        var errorMessage = error.message;
+        console.log('errorMessage: ', errorMessage);
+        var email = error.email;
+        console.log('email: ', email);
+        var credential = error.credential;
+        console.log('credential: ', credential);
+      });
+  },
   loginWithEmail: (email, password) => {
     return firebase.auth().signInWithEmailAndPassword(email, password);
   },
@@ -45,11 +76,11 @@ const Firebase = {
       .ref('users/' + userId + '/planning')
       .push(data);
   },
-  addKeyToItem: (uniqueKey, date, message, item, userId) => {
+  addKeyToItem: (notifKey, date, message, item, userId) => {
     return firebase
       .database()
       .ref('users/' + userId + '/planning/' + item)
-      .set({notifKey: uniqueKey, notifDate: date, notifMessage: message});
+      .set({notifKey: notifKey, notifDate: date, notifMessage: message});
   },
   getCurrentUserName: userId => {
     return firebase

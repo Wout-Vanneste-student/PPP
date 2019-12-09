@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Platform,
   StatusBar,
+  View,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -54,11 +55,11 @@ class Onboarding extends Component {
   };
   _renderItem = ({item}) => {
     return (
-      <SafeAreaView style={styles.onboarding}>
+      <View style={styles.onboardingView}>
         <Image style={styles.title_image} source={item.title_image} />
         <Image style={styles.image} source={item.image} />
         <Text style={styles.onboardingText}>{item.text}</Text>
-      </SafeAreaView>
+      </View>
     );
   };
   _renderNextButton = () => {
@@ -84,20 +85,22 @@ class Onboarding extends Component {
 
   render() {
     return (
-      <AppIntroSlider
-        showSkipButton
-        showPrevButton
-        renderDoneButton={this._renderDoneButton}
-        renderNextButton={this._renderNextButton}
-        renderSkipButton={this._renderSkipButton}
-        renderPrevButton={this._renderPrevButton}
-        renderItem={this._renderItem}
-        slides={slides}
-        onDone={this._onDone}
-        dotStyle={styles.dotstyle}
-        activeDotStyle={styles.activedotstyle}
-        style={styles.hideStatusBar}
-      />
+      <SafeAreaView style={styles.onboarding}>
+        <AppIntroSlider
+          showSkipButton
+          showPrevButton
+          renderDoneButton={this._renderDoneButton}
+          renderNextButton={this._renderNextButton}
+          renderSkipButton={this._renderSkipButton}
+          renderPrevButton={this._renderPrevButton}
+          renderItem={this._renderItem}
+          slides={slides}
+          onDone={this._onDone}
+          dotStyle={styles.dotstyle}
+          activeDotStyle={styles.activedotstyle}
+          style={styles.hideStatusBar}
+        />
+      </SafeAreaView>
     );
   }
 }
@@ -110,16 +113,21 @@ const styles = StyleSheet.create({
   },
   onboarding: {
     paddingTop: 25,
-    paddingBottom: 100,
+    paddingBottom: Platform.OS === 'android' ? 0 : 100,
     backgroundColor: '#44234C',
+    flex: 1,
+  },
+  onboardingView: {
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingBottom: 100,
   },
   onboardingText: {
     color: 'white',
     fontSize: 20,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     textAlign: 'center',
     paddingHorizontal: 30,
   },
@@ -134,7 +142,8 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   customButton: {
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 17.5,
     color: 'white',
     marginTop: 7.5,

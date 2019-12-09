@@ -9,6 +9,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
+import firebase from '../config/Firebase';
 
 class Startup extends Component {
   constructor() {
@@ -24,6 +25,15 @@ class Startup extends Component {
     header: null,
   };
 
+  handleLoginWithFacebook = async () => {
+    console.log('handle facebook login');
+    const response = await firebase.loginWithFacebook();
+    console.log(response);
+    // if (response.user.uid) {
+    //   this.setState({userFound: true});
+    // }
+  };
+
   render() {
     const {navigate} = this.props.navigation;
     return (
@@ -37,6 +47,11 @@ class Startup extends Component {
             style={[styles.big_button, styles.top_button]}
             onPress={() => navigate('Login')}>
             <Text style={styles.button_text}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.big_button, styles.top_button]}
+            onPress={() => this.handleLoginWithFacebook()}>
+            <Text style={styles.button_text}>Login with Facebook</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.big_button}
@@ -69,7 +84,8 @@ const styles = StyleSheet.create({
   bottom_text: {
     color: '#44234C',
     fontSize: 17.5,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     textAlign: 'center',
     paddingHorizontal: 30,
   },
@@ -90,7 +106,8 @@ const styles = StyleSheet.create({
   button_text: {
     color: '#44234C',
     fontSize: 25,
-    fontFamily: 'Customfont-Bold',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
 });
 export default Startup;

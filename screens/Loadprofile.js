@@ -80,9 +80,15 @@ class Loadprofile extends Component {
       const key = item.key;
       const itemStringify = JSON.stringify(item);
       const itemArray = JSON.parse(itemStringify);
-      const time = itemArray.notifDate;
-      const title = itemArray.notifMessage;
-      const toAddItem = {key, time, title};
+      const notificationMessage = itemArray.notifMessage;
+      const notificationDate = itemArray.notifDate;
+      const notificationKey = itemArray.notifKey;
+      const toAddItem = {
+        key,
+        notificationMessage,
+        notificationDate,
+        notificationKey,
+      };
       dataList.push(toAddItem);
     });
     AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
@@ -128,7 +134,8 @@ const styles = StyleSheet.create({
   bottom_text: {
     color: '#44234C',
     fontSize: 17.5,
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     textAlign: 'center',
     paddingHorizontal: 30,
   },

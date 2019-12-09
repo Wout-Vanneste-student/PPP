@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {
   Text,
   TouchableOpacity,
@@ -64,14 +64,18 @@ class Profile extends Component {
 
   render() {
     return (
-      <SafeAreaView style={styles.hideStatusBar}>
-        <Text style={styles.headerText}>Hello {this.state.userName}</Text>
-        <TouchableOpacity
-          style={styles.big_button}
-          onPress={() => this.handleSignout()}>
-          <Text style={styles.button_text}>Sign out</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
+      <Fragment>
+        <SafeAreaView style={styles.topBar} />
+        <SafeAreaView style={styles.hideStatusBar}>
+          <StatusBar barStyle="light-content" />
+          <Text style={styles.headerText}>Hello {this.state.userName}</Text>
+          <TouchableOpacity
+            style={styles.big_button}
+            onPress={() => this.handleSignout()}>
+            <Text style={styles.button_text}>Sign out</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </Fragment>
     );
   }
 }
@@ -82,6 +86,10 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     flex: 1,
     justifyContent: 'space-between',
+  },
+  topBar: {
+    flex: 0,
+    backgroundColor: '#44234C',
   },
   big_button: {
     borderWidth: 2,
@@ -98,7 +106,8 @@ const styles = StyleSheet.create({
   button_text: {
     color: '#44234C',
     fontSize: 20,
-    fontFamily: 'Customfont-Bold',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   item: {
     marginLeft: 0,
@@ -122,7 +131,8 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: '#44234C',
     textAlign: 'center',
-    fontFamily: 'Customfont-Regular',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     marginBottom: 75,
     marginTop: 50,
   },
