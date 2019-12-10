@@ -76,12 +76,6 @@ const Firebase = {
       .ref('users/' + userId + '/planning')
       .push(data);
   },
-  addKeyToItem: (notifKey, date, message, item, userId) => {
-    return firebase
-      .database()
-      .ref('users/' + userId + '/planning/' + item)
-      .set({notifKey: notifKey, notifDate: date, notifMessage: message});
-  },
   getCurrentUserName: userId => {
     return firebase
       .database()
@@ -98,7 +92,7 @@ const Firebase = {
     return firebase
       .database()
       .ref('users/' + userId + '/planning')
-      .orderByChild('time')
+      .orderByChild('sortDate')
       .once('value', function(snap) {
         let items = [];
         snap.forEach(function(item) {

@@ -29,8 +29,7 @@ class Addplanning extends Component {
       notifDate: new Date(),
       mode: 'date',
       show: false,
-      // minDate: new Date(new Date().setDate(new Date().getDate() + 1)),
-      minDate: new Date(),
+      minDate: new Date(new Date().setDate(new Date().getDate() + 1)),
       selectedDateMinutes: null,
       selectedDateHours: null,
     };
@@ -66,10 +65,12 @@ class Addplanning extends Component {
     const currentUserId = await firebase.getCurrentUserId();
     const notifMessage = this.state.notifMessage;
     const notifKey = Math.floor(Math.random() * Math.floor(100000000));
+    const sortDate = JSON.stringify(date);
     const planningData = {
       notifDate,
       notifMessage,
       notifKey,
+      sortDate,
     };
     try {
       const response = await firebase.addPlanningItem(
@@ -85,8 +86,9 @@ class Addplanning extends Component {
       console.log(error);
     } finally {
       if (this.state.planningAdded === true) {
+        const dataList = [];
         const data = await firebase.getPlanningUser(currentUserId);
-        let dataList = [];
+        let removeList = [];
         data.forEach(item => {
           const key = item.key;
           const itemStringify = JSON.stringify(item);
@@ -94,27 +96,45 @@ class Addplanning extends Component {
           const notificationMessage = itemArray.notifMessage;
           const notificationDate = itemArray.notifDate;
           const notificationKey = itemArray.notifKey;
+          const notifDateString = JSON.stringify(notificationDate);
+          const dateDay = notifDateString.substring(1, 3);
+          const dateMonth = notifDateString.substring(4, 6);
+          const dateYear = notifDateString.substring(7, 11);
+          const dateHours = notifDateString.substring(15, 17);
+          const dateMinutes = notifDateString.substring(18, 20);
+          const dateFormat = dateYear + '/' + dateMonth + '/' + dateDay;
+          let checkDate = new Date(dateFormat);
+          checkDate.setSeconds(0);
+          checkDate.setMinutes(dateMinutes);
+          checkDate.setHours(dateHours);
           const toAddItem = {
             key,
             notificationMessage,
             notificationDate,
             notificationKey,
           };
-          dataList.push(toAddItem);
+          if (new Date().getTime() > checkDate.getTime() + 10000) {
+            removeList.push(toAddItem);
+          } else {
+            dataList.push(toAddItem);
+          }
+        });
+        removeList.forEach(async item => {
+          await firebase.removePlanningItem(currentUserId, item.key);
         });
         AsyncStorage.removeItem('userPlanning');
         AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
+        const roundSecondsDate = new Date(new Date(date).setSeconds(0));
+        const test = JSON.stringify(notifKey);
+        this.notif.scheduleNotif(roundSecondsDate, message, test);
+        const {navigate} = this.props.navigation;
+        navigate('Planning');
       }
     }
-    const roundSecondsDate = new Date(new Date(date).setSeconds(0));
-    const test = JSON.stringify(notifKey);
-    this.notif.scheduleNotif(roundSecondsDate, message, test);
-    const {navigate} = this.props.navigation;
-    navigate('Planning');
   };
 
   handleCheckText = () => {
-    if (this.state.notifDate.getDate() !== null /*new Date().getDate()*/) {
+    if (this.state.notifDate.getDate() !== new Date().getDate()) {
       this.setState({canSubmit: true});
     } else {
       this.setState({canSubmit: false});
@@ -176,7 +196,7 @@ class Addplanning extends Component {
     const {navigate} = this.props.navigation;
     const {show, minDate, notifDate, mode} = this.state;
     let notificationDate;
-    if (notifDate.getDate() !== null /*new Date().getDate()*/) {
+    if (notifDate.getDate() !== new Date().getDate()) {
       let dd = notifDate.getDate();
       let mm = notifDate.getMonth() + 1;
       const yyyy = notifDate.getFullYear();
@@ -255,8 +275,7 @@ class Addplanning extends Component {
                     )}
               </View>
             </View>
-            {this.state.notifDate.getDate() ===
-            null /*new Date().getDate()*/ ? (
+            {this.state.notifDate.getDate() === new Date().getDate() ? (
               <Text style={styles.notificationText}>
                 We'll send you a notification
               </Text>

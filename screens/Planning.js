@@ -31,9 +31,40 @@ class Planning extends Component {
   };
 
   getPlanning = async () => {
-    const dataList = await AsyncStorage.getItem('userPlanning');
+    let dataList = await AsyncStorage.getItem('userPlanning');
+    const dataListParse = JSON.parse(dataList);
+    const removeList = [];
+    dataListParse.forEach(item => {
+      const key = item.key;
+      const itemStringify = JSON.stringify(item);
+      const itemArray = JSON.parse(itemStringify);
+      const notificationDate = itemArray.notificationDate;
+      const notifDateString = JSON.stringify(notificationDate);
+      const dateDay = notifDateString.substring(1, 3);
+      const dateMonth = notifDateString.substring(4, 6);
+      const dateYear = notifDateString.substring(7, 11);
+      const dateHours = notifDateString.substring(15, 17);
+      const dateMinutes = notifDateString.substring(18, 20);
+      const dateFormat = dateYear + '/' + dateMonth + '/' + dateDay;
+      let checkDate = new Date(dateFormat);
+      checkDate.setSeconds(0);
+      checkDate.setMinutes(dateMinutes);
+      checkDate.setHours(dateHours);
+      const toAddItem = {
+        key,
+      };
+      if (new Date().getTime() > checkDate.getTime() + 10000) {
+        removeList.push(toAddItem);
+        dataListParse.splice(dataListParse.indexOf(item), 1);
+      }
+    });
+    const currentUserId = await firebase.getCurrentUserId();
+    removeList.forEach(async removeItem => {
+      await firebase.removePlanningItem(currentUserId, removeItem.key);
+    });
+    dataList = dataListParse;
     if (dataList !== null) {
-      this.setState({userPlanning: JSON.parse(dataList)});
+      this.setState({userPlanning: dataList});
     }
   };
 
@@ -50,9 +81,10 @@ class Planning extends Component {
   };
 
   reloadPlanningAfterRemove = async () => {
-    const dataList = [];
     const currentUserId = await firebase.getCurrentUserId();
+    const dataList = [];
     const data = await firebase.getPlanningUser(currentUserId);
+    let removeList = [];
     data.forEach(item => {
       const key = item.key;
       const itemStringify = JSON.stringify(item);
@@ -60,13 +92,32 @@ class Planning extends Component {
       const notificationMessage = itemArray.notifMessage;
       const notificationDate = itemArray.notifDate;
       const notificationKey = itemArray.notifKey;
+      const notifDateString = JSON.stringify(notificationDate);
+      const dateDay = notifDateString.substring(1, 3);
+      const dateMonth = notifDateString.substring(4, 6);
+      const dateYear = notifDateString.substring(7, 11);
+      const dateHours = notifDateString.substring(15, 17);
+      const dateMinutes = notifDateString.substring(18, 20);
+      const dateFormat = dateYear + '/' + dateMonth + '/' + dateDay;
+      let checkDate = new Date(dateFormat);
+      checkDate.setSeconds(0);
+      checkDate.setMinutes(dateMinutes);
+      checkDate.setHours(dateHours);
       const toAddItem = {
         key,
         notificationMessage,
         notificationDate,
         notificationKey,
       };
-      dataList.push(toAddItem);
+      if (new Date().getTime() > checkDate.getTime() + 10000) {
+        removeList.push(toAddItem);
+      } else {
+        dataList.push(toAddItem);
+      }
+    });
+    removeList.forEach(async item => {
+      console.log('remove: ', item);
+      // await firebase.removePlanningItem(this.currentUserId, item.key);
     });
     await AsyncStorage.removeItem('userPlanning');
     await AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
@@ -141,7 +192,13 @@ const UserPlanning = ({data, handleRemovePlanningItem}) => {
     <>
       {data.map((item, i) => {
         return (
-          <View style={styles.planningItem} key={i}>
+          <View
+            style={
+              i === data.length - 1
+                ? styles.planningItem
+                : [styles.planningItem, styles.planningItemBorder]
+            }
+            key={i}>
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() => handleRemovePlanningItem(item)}>
@@ -171,7 +228,6 @@ const styles = StyleSheet.create({
   hideStatusBar: {
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     marginBottom: 25,
-    // paddingHorizontal: Platform.OS === "android" ? 15 : 0,
     marginHorizontal: 15,
     flex: 1,
     display: 'flex',
@@ -227,13 +283,15 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
+  planningItemBorder: {
+    borderBottomColor: '#44234C',
+    borderBottomWidth: 1,
+  },
   planningItem: {
     marginBottom: 15,
     display: 'flex',
     flexDirection: 'row',
-    borderBottomColor: '#788ADA',
     paddingBottom: 15,
-    borderBottomWidth: 1,
   },
   planningDate: {
     color: '#44234C',

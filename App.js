@@ -4,10 +4,9 @@ import {YellowBox} from 'react-native';
 
 import 'react-native-gesture-handler';
 
-YellowBox.ignoreWarnings(
-  ['Warning: Async Storage has been extracted from react-native core'],
-  ['Warning: Setting a timer for a long period of time'],
-);
+YellowBox.ignoreWarnings([
+  "Warning: Can't perform a React state update on an unmounted component",
+]);
 
 class App extends Component {
   render() {

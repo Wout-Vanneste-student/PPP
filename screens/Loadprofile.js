@@ -76,6 +76,7 @@ class Loadprofile extends Component {
   loadUserdata = async () => {
     const dataList = [];
     const data = await firebase.getPlanningUser(this.currentUserId);
+    let removeList = [];
     data.forEach(item => {
       const key = item.key;
       const itemStringify = JSON.stringify(item);
@@ -83,13 +84,31 @@ class Loadprofile extends Component {
       const notificationMessage = itemArray.notifMessage;
       const notificationDate = itemArray.notifDate;
       const notificationKey = itemArray.notifKey;
+      const notifDateString = JSON.stringify(notificationDate);
+      const dateDay = notifDateString.substring(1, 3);
+      const dateMonth = notifDateString.substring(4, 6);
+      const dateYear = notifDateString.substring(7, 11);
+      const dateHours = notifDateString.substring(15, 17);
+      const dateMinutes = notifDateString.substring(18, 20);
+      const dateFormat = dateYear + '/' + dateMonth + '/' + dateDay;
+      let checkDate = new Date(dateFormat);
+      checkDate.setSeconds(0);
+      checkDate.setMinutes(dateMinutes);
+      checkDate.setHours(dateHours);
       const toAddItem = {
         key,
         notificationMessage,
         notificationDate,
         notificationKey,
       };
-      dataList.push(toAddItem);
+      if (new Date().getTime() > checkDate.getTime() + 10000) {
+        removeList.push(toAddItem);
+      } else {
+        dataList.push(toAddItem);
+      }
+    });
+    removeList.forEach(async item => {
+      await firebase.removePlanningItem(this.currentUserId, item.key);
     });
     AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
     this.setState({dataFound: true});
