@@ -1,71 +1,190 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import {
   Text,
+  SafeAreaView,
   StyleSheet,
   Platform,
   StatusBar,
-  SafeAreaView,
+  View,
+  ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 
+// Import the extensions array
+import * as ExtensionList from '../extensions/extensionOverview';
+
 class Extensions extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedExtension: null,
+      extensionsList: Object.keys(ExtensionList).map(function(key) {
+        return [String(key), ExtensionList[key]];
+      }),
+    };
   }
-  static navigationOptions = {
-    header: null,
-    headerMode: 'none',
+
+  extensionsView = () => {
+    return (
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.extensionsGrid}>
+        {this.state.extensionsList.map((item, i) => {
+          const extensionIcon = new ExtensionList[item[0]]().extensionIcon();
+          let name = item[0];
+          if (name.length > 11) {
+            name = name.substr(0, 9) + '...';
+          }
+          return (
+            <TouchableOpacity
+              style={styles.extensionButton}
+              key={i}
+              onPress={() =>
+                this.setState({
+                  selectedExtension: item,
+                })
+              }>
+              <Image style={styles.extensionsIcon} source={extensionIcon} />
+              <Text style={styles.extensionName}>{name}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    );
+  };
+
+  renderExtensions = () => {
+    if (this.state.selectedExtension === null) {
+      return this.extensionsView();
+    } else {
+      const ToShowExtension = this.state.selectedExtension[0];
+      const Extension = ExtensionList[ToShowExtension];
+      return <Extension />;
+    }
   };
 
   render() {
-    const {navigate} = this.props.navigation;
+    const {selectedExtension} = this.state;
     return (
-      <Fragment>
+      <>
         <SafeAreaView style={styles.topBar} />
         <SafeAreaView style={styles.hideStatusBar}>
-          <StatusBar barStyle="light-content" />
-          <Text style={styles.headerText}>Extensions page</Text>
-          <Text style={styles.smallText}>
-            Here all the extions will be shown and you'll be able to navigate to
-            them
-          </Text>
-          <TouchableOpacity onPress={() => navigate('Weather')}>
-            <Text>Weather</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigate('Planning')}>
-            <Text>Planning</Text>
-          </TouchableOpacity>
+          {selectedExtension !== null ? (
+            <View style={styles.topFlex}>
+              <TouchableOpacity
+                style={styles.goBack}
+                onPress={() => this.setState({selectedExtension: null})}>
+                <Image
+                  style={styles.goBackArrow}
+                  source={require('../assets/img/arrow.png')}
+                />
+                <Text style={styles.goBackText}>Extensions</Text>
+              </TouchableOpacity>
+              <Image
+                source={require('../assets/img/wizer_dark.png')}
+                style={styles.brandingImage}
+              />
+            </View>
+          ) : (
+            <View style={styles.topFlex}>
+              <Text style={styles.extenionsTitle}>Extensions</Text>
+              <Image
+                source={require('../assets/img/wizer_dark.png')}
+                style={styles.brandingImage}
+              />
+            </View>
+          )}
+          <View style={styles.extensionView}>{this.renderExtensions()}</View>
         </SafeAreaView>
-      </Fragment>
+      </>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  hideStatusBar: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    flex: 1,
+  extensionsGrid: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   topBar: {
     flex: 0,
     backgroundColor: '#44234C',
   },
-  headerText: {
+  hideStatusBar: {
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    flex: 1,
+    marginHorizontal: 20,
+  },
+  extensionButton: {
+    padding: 5,
+    width: 96,
+    height: 80,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 5,
+    marginVertical: 15,
+  },
+  extensionsIcon: {
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
+  },
+  extensionName: {
+    color: '#44234C',
+    fontSize: 15,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+    textAlign: 'right',
+  },
+  extensionView: {
+    flex: 1,
+  },
+  brandingImage: {
+    width: 90,
+    height: 30,
+    resizeMode: 'contain',
+  },
+  topFlex: {
+    marginBottom: 10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
+  },
+  goBackText: {
+    color: '#44234C',
+    fontSize: 15,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+    textAlign: 'right',
+  },
+  extenionsTitle: {
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 25,
     color: '#44234C',
-    textAlign: 'center',
-    fontFamily:
-      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-    marginBottom: 75,
-    marginTop: 50,
   },
-  smallText: {
-    fontSize: 15,
-    color: '#44234C',
-    textAlign: 'center',
-    marginHorizontal: 15,
-    fontFamily:
-      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+  goBack: {
+    borderWidth: 1,
+    borderColor: '#44234C',
+    borderRadius: 5,
+    width: 125,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  goBackArrow: {
+    width: 12.5,
+    height: 12.5,
+    resizeMode: 'contain',
+    marginTop: 3,
   },
 });
 

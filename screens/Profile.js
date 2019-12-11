@@ -6,6 +6,8 @@ import {
   Platform,
   StatusBar,
   SafeAreaView,
+  Linking,
+  View,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -69,11 +71,24 @@ class Profile extends Component {
         <SafeAreaView style={styles.hideStatusBar}>
           <StatusBar barStyle="light-content" />
           <Text style={styles.headerText}>Hello {this.state.userName}</Text>
-          <TouchableOpacity
-            style={styles.big_button}
-            onPress={() => this.handleSignout()}>
-            <Text style={styles.button_text}>Sign out</Text>
-          </TouchableOpacity>
+          <View>
+            <Text style={styles.thankDesigner}>
+              I have to thank the illustrator that provided the free to use
+              illustrations
+            </Text>
+            <TouchableOpacity
+              style={styles.thankDesignerButton}
+              onPress={() => {
+                Linking.openURL('https://www.freepik.com/slidesgo');
+              }}>
+              <Text style={styles.thankDesignerButtonText}>Illustrator</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.big_button}
+              onPress={() => this.handleSignout()}>
+              <Text style={styles.button_text}>Sign out</Text>
+            </TouchableOpacity>
+          </View>
         </SafeAreaView>
       </Fragment>
     );
@@ -86,6 +101,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     flex: 1,
     justifyContent: 'space-between',
+    marginHorizontal: 20,
   },
   topBar: {
     flex: 0,
@@ -95,7 +111,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#44234C',
     borderRadius: 5,
-    width: 300,
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -109,24 +125,6 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
-  item: {
-    marginLeft: 0,
-    paddingLeft: 0,
-    marginRight: 0,
-    paddingRight: 0,
-  },
-  form: {
-    marginLeft: 10,
-    paddingLeft: 10,
-    marginRight: 10,
-    paddingRight: 10,
-  },
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 'auto',
-  },
   headerText: {
     fontSize: 25,
     color: '#44234C',
@@ -135,6 +133,35 @@ const styles = StyleSheet.create({
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     marginBottom: 75,
     marginTop: 50,
+  },
+  thankDesigner: {
+    fontSize: 15,
+    width: '85%',
+    alignSelf: 'center',
+    marginBottom: 15,
+    color: '#44234C',
+    textAlign: 'center',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+  },
+  thankDesignerButton: {
+    marginBottom: 50,
+    borderWidth: 1,
+    borderColor: '#44234C',
+    borderRadius: 5,
+    width: '80%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 5,
+    paddingBottom: Platform.OS === 'android' ? 10 : 5,
+    alignSelf: 'center',
+  },
+  thankDesignerButtonText: {
+    color: '#44234C',
+    fontSize: 17,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
 });
 

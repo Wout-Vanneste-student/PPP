@@ -1,29 +1,35 @@
 import React, {Component} from 'react';
 import {
   Text,
-  SafeAreaView,
   View,
   Image,
   Platform,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import firebase from '../config/Firebase';
-import NotificationService from '../config/Notifications/NotificationService';
+import firebase from '../../config/Firebase';
+import NotificationService from '../../config/Notifications/NotificationService';
+import Addplanning from './Addplanning';
 
-class Planning extends Component {
+class PlanningClass extends Component {
   constructor() {
     super();
     this.state = {
       userPlanning: [],
+      addPlanning: false,
     };
     this.notif = new NotificationService();
+    this.addItem = this.addItem.bind(this);
+    // this.extensionIcon = this.extensionIcon.bind(this);
   }
-  static navigationOptions = {
-    header: null,
+
+  extensionIcon = () => {
+    const icons = {
+      icon: require('../Planning/icon.png'),
+    };
+    return icons.icon;
   };
 
   cancelNotif = async number => {
@@ -32,39 +38,8 @@ class Planning extends Component {
 
   getPlanning = async () => {
     let dataList = await AsyncStorage.getItem('userPlanning');
-    const dataListParse = JSON.parse(dataList);
-    const removeList = [];
-    dataListParse.forEach(item => {
-      const key = item.key;
-      const itemStringify = JSON.stringify(item);
-      const itemArray = JSON.parse(itemStringify);
-      const notificationDate = itemArray.notificationDate;
-      const notifDateString = JSON.stringify(notificationDate);
-      const dateDay = notifDateString.substring(1, 3);
-      const dateMonth = notifDateString.substring(4, 6);
-      const dateYear = notifDateString.substring(7, 11);
-      const dateHours = notifDateString.substring(15, 17);
-      const dateMinutes = notifDateString.substring(18, 20);
-      const dateFormat = dateYear + '/' + dateMonth + '/' + dateDay;
-      let checkDate = new Date(dateFormat);
-      checkDate.setSeconds(0);
-      checkDate.setMinutes(dateMinutes);
-      checkDate.setHours(dateHours);
-      const toAddItem = {
-        key,
-      };
-      if (new Date().getTime() > checkDate.getTime() + 10000) {
-        removeList.push(toAddItem);
-        dataListParse.splice(dataListParse.indexOf(item), 1);
-      }
-    });
-    const currentUserId = await firebase.getCurrentUserId();
-    removeList.forEach(async removeItem => {
-      await firebase.removePlanningItem(currentUserId, removeItem.key);
-    });
-    dataList = dataListParse;
     if (dataList !== null) {
-      this.setState({userPlanning: dataList});
+      this.setState({userPlanning: JSON.parse(dataList)});
     }
   };
 
@@ -117,7 +92,7 @@ class Planning extends Component {
     });
     removeList.forEach(async item => {
       console.log('remove: ', item);
-      // await firebase.removePlanningItem(this.currentUserId, item.key);
+      await firebase.removePlanningItem(this.currentUserId, item.key);
     });
     await AsyncStorage.removeItem('userPlanning');
     await AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
@@ -136,25 +111,20 @@ class Planning extends Component {
     this.reloadPlanningAfterRemove();
   };
 
-  render() {
-    const {navigate} = this.props.navigation;
-    return this.state.userPlanning === [] ? null : (
-      <SafeAreaView
-        forceInset={{bottom: 'always', top: 'never'}}
-        style={styles.hideStatusBar}>
-        <View>
-          <View style={styles.topFlex}>
-            <Image
-              source={require('../assets/img/wizer_dark.png')}
-              style={styles.brandingImage}
-            />
-            <Text style={styles.headerText}>Your planning</Text>
-          </View>
+  addItem = () => {
+    this.setState({addPlanning: false});
+  };
 
+  render() {
+    return this.state.addPlanning ? (
+      <Addplanning action={this.addItem} />
+    ) : (
+      <View style={styles.planningWrapper}>
+        <View>
           {this.state.userPlanning.length === 0 ? (
             <View style={styles.imageView}>
               <Image
-                source={require('../assets/img/free.png')}
+                source={require('../../assets/img/free.png')}
                 style={styles.freeImg}
               />
               <Text style={styles.planningHelp}>
@@ -163,6 +133,11 @@ class Planning extends Component {
             </View>
           ) : (
             <>
+              <View style={styles.planningHeader}>
+                <Text style={styles.planningHeaderText}>
+                  This is your planning
+                </Text>
+              </View>
               <ScrollView
                 showsHorizontalScrollIndicator={false}
                 style={styles.scrollview}>
@@ -179,10 +154,10 @@ class Planning extends Component {
         </View>
         <TouchableOpacity
           style={styles.big_button}
-          onPress={() => navigate('Addplanning')}>
+          onPress={() => this.setState({addPlanning: true})}>
           <Text style={styles.button_text}>Add item to planning</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     );
   }
 }
@@ -204,7 +179,7 @@ const UserPlanning = ({data, handleRemovePlanningItem}) => {
               onPress={() => handleRemovePlanningItem(item)}>
               <Image
                 style={styles.removeImage}
-                source={require('../assets/img/trashcan.png')}
+                source={require('../../assets/img/trashcan.png')}
               />
             </TouchableOpacity>
             <View>
@@ -225,12 +200,9 @@ const UserPlanning = ({data, handleRemovePlanningItem}) => {
 const styles = StyleSheet.create({
   flexshrink: {flexShrink: 1},
   scrollview: {height: '70%'},
-  hideStatusBar: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    marginBottom: 25,
-    marginHorizontal: 15,
-    flex: 1,
+  planningWrapper: {
     display: 'flex',
+    height: '100%',
     justifyContent: 'space-between',
   },
   planningHelp: {
@@ -244,6 +216,16 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     color: '#44234C',
+  },
+  planningHeader: {
+    marginTop: 5,
+    marginBottom: 20,
+  },
+  planningHeaderText: {
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-Bold' : 'Didot-bold',
+    color: '#44234C',
+    fontSize: 20,
   },
   headerText: {
     fontFamily:
@@ -266,13 +248,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#44234C',
     borderRadius: 5,
-    width: 300,
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 5,
     paddingBottom: Platform.OS === 'android' ? 10 : 5,
     alignSelf: 'center',
+    marginBottom: 25,
   },
   buttonDisabled: {
     opacity: 0.2,
@@ -333,4 +316,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Planning;
+export default PlanningClass;

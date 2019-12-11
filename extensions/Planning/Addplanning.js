@@ -12,8 +12,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import firebase from '../config/Firebase';
-import NotificationService from '../config/Notifications/NotificationService';
+import firebase from '../../config/Firebase';
+import NotificationService from '../../config/Notifications/NotificationService';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -127,8 +127,7 @@ class Addplanning extends Component {
         const roundSecondsDate = new Date(new Date(date).setSeconds(0));
         const test = JSON.stringify(notifKey);
         this.notif.scheduleNotif(roundSecondsDate, message, test);
-        const {navigate} = this.props.navigation;
-        navigate('Planning');
+        this.props.action();
       }
     }
   };
@@ -140,6 +139,13 @@ class Addplanning extends Component {
       this.setState({canSubmit: false});
     }
     this.setState({canSubmit: true});
+  };
+
+  handleChangeText = notifMessage => {
+    this.setState({notifMessage});
+    if (this.state.notifDate.getDate() !== new Date().getDate()) {
+      this.setState({canSubmit: true});
+    }
   };
 
   setDate = (event, date) => {
@@ -193,7 +199,7 @@ class Addplanning extends Component {
   };
 
   render() {
-    const {navigate} = this.props.navigation;
+    // const {navigate} = this.props.navigation;
     const {show, minDate, notifDate, mode} = this.state;
     let notificationDate;
     if (notifDate.getDate() !== new Date().getDate()) {
@@ -220,22 +226,23 @@ class Addplanning extends Component {
     }
 
     return (
-      <SafeAreaView style={styles.hideStatusBar}>
+      <View style={styles.addContainer}>
         <TouchableWithoutFeedback
           style={styles.flex}
           onPress={Keyboard.dismiss}
           accessible={false}>
           <View style={styles.touchableWithoutFeedback}>
             <View style={styles.formContainer}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.goBack}
-                onPress={() => navigate('Planning')}>
+                onPress={() => navigate('Planning')}
+              >
                 <Image
                   style={styles.goBackArrow}
-                  source={require('../assets/img/arrow.png')}
+                  source={require('../../assets/img/arrow.png')}
                 />
                 <Text style={styles.goBackText}>Go back</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <Text style={styles.formTitle}>
                 Add something to your planning
               </Text>
@@ -246,16 +253,18 @@ class Addplanning extends Component {
                   textAlignVertical="top"
                   style={styles.textInput}
                   onEndEditing={this.handleCheckText}
-                  onChangeText={notifMessage => this.setState({notifMessage})}
+                  onChangeText={notifMessage =>
+                    this.handleChangeText(notifMessage)
+                  }
                   value={this.state.notifMessage}
                 />
               </View>
               <View>
                 <View>
                   <TouchableOpacity
-                    style={styles.big_button}
+                    style={styles.date_button}
                     onPress={this.datePicker}>
-                    <Text style={styles.button_text}>
+                    <Text style={styles.date_button_text}>
                       Select date &amp; time
                     </Text>
                   </TouchableOpacity>
@@ -301,21 +310,18 @@ class Addplanning extends Component {
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
-      </SafeAreaView>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   flex: {flex: 1},
-  hideStatusBar: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    paddingBottom: 30,
+  addContainer: {
     flex: 1,
   },
   iosDatePicker: {marginTop: 15},
   touchableWithoutFeedback: {
-    paddingHorizontal: 20,
     flex: 1,
     display: 'flex',
     justifyContent: 'space-between',
@@ -331,31 +337,55 @@ const styles = StyleSheet.create({
   },
   notificationText: {
     fontFamily:
-      Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
+      Platform.OS === 'android'
+        ? 'Playfair-Display-italic'
+        : Platform.OS === 'android'
+        ? 'Playfair-Display-italic'
+        : 'Didot-Italic',
     color: '#44234C',
     fontSize: 16,
     textAlign: 'center',
+  },
+  date_button: {
+    backgroundColor: '#44234C',
+
+    borderRadius: 5,
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 5,
+    paddingBottom: Platform.OS === 'android' ? 10 : 5,
+    alignSelf: 'center',
+    marginBottom: 25,
+  },
+  date_button_text: {
+    color: 'white',
+    fontSize: 25,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   big_button: {
     borderWidth: 2,
     borderColor: '#44234C',
     borderRadius: 5,
-    width: 300,
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 7.5,
-    paddingBottom: 12.5,
+    paddingBottom: Platform.OS === 'android' ? 12.5 : 7.5,
     alignSelf: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.2,
+    marginBottom: 25,
   },
   button_text: {
     color: '#44234C',
     fontSize: 25,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
+  },
+  buttonDisabled: {
+    opacity: 0.2,
   },
   textInput: {
     borderBottomWidth: 2,
@@ -381,26 +411,6 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     textAlign: 'right',
-  },
-  goBack: {
-    borderWidth: 1,
-    borderColor: '#44234C',
-    borderRadius: 5,
-    width: 100,
-    marginTop: 15,
-    marginBottom: 25,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  goBackArrow: {
-    width: 12.5,
-    height: 12.5,
-    resizeMode: 'contain',
-    marginTop: 3,
   },
 });
 
