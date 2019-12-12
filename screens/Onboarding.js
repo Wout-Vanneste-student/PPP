@@ -21,14 +21,6 @@ const slides = [
     image: require('../assets/img/todo.png'),
     backgroundColor: '#44234C',
   },
-  {
-    key: 'onboarding2',
-    title: 'Wizer weather',
-    text: 'Check the weather at any time, anywhere',
-    title_image: require('../assets/img/wizer_white.png'),
-    image: require('../assets/img/weather.png'),
-    backgroundColor: '#44234C',
-  },
 ];
 
 class Onboarding extends Component {
@@ -62,19 +54,8 @@ class Onboarding extends Component {
       </View>
     );
   };
-  _renderNextButton = () => {
-    return <Text style={[styles.customButton, styles.rightButton]}>Next</Text>;
-  };
   _renderDoneButton = () => {
     return <Text style={[styles.customButton, styles.rightButton]}>Done</Text>;
-  };
-  _renderSkipButton = () => {
-    return <Text style={[styles.customButton, styles.leftButton]}>Skip</Text>;
-  };
-  _renderPrevButton = () => {
-    return (
-      <Text style={[styles.customButton, styles.leftButton]}>Previous</Text>
-    );
   };
 
   _onDone = () => {
@@ -90,9 +71,6 @@ class Onboarding extends Component {
           showSkipButton
           showPrevButton
           renderDoneButton={this._renderDoneButton}
-          renderNextButton={this._renderNextButton}
-          renderSkipButton={this._renderSkipButton}
-          renderPrevButton={this._renderPrevButton}
           renderItem={this._renderItem}
           slides={slides}
           onDone={this._onDone}

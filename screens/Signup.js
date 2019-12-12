@@ -10,6 +10,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 // import _ from 'lodash';
@@ -174,174 +175,187 @@ class Signup extends Component {
 
   render() {
     return (
-      <KeyboardAvoidingView
-        style={styles.hideStatusBar}
-        behavior="padding"
-        enabled>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.form}>
-            <Image
-              style={styles.title_image}
-              source={require('../assets/img/wizer_dark.png')}
-            />
-            <View>
-              <Text style={styles.inputLabel}>Username</Text>
-              <TextInput
-                style={styles.textInput}
-                onEndEditing={() => this.handleCheckuserName()}
-                autoCorrect={false}
-                autoCapitalize="words"
-                value={this.state.userName}
-                onChangeText={userName =>
-                  this.setState({userName, userNameError: ''})
-                }
+      <SafeAreaView style={styles.safeView}>
+        <KeyboardAvoidingView
+          style={styles.hideStatusBar}
+          keyboardVerticalOffset={-500}
+          behavior={Platform.OS === 'android' ? 'padding' : 'padding'}
+          enabled>
+          <ScrollView
+            style={styles.scrollview}
+            showsVerticalScrollIndicator={false}>
+            <View style={styles.form}>
+              <Image
+                style={styles.title_image}
+                source={require('../assets/img/wizer_dark.png')}
               />
-              <Text style={styles.inputHelp}>
-                We'll call you by your username
-              </Text>
-              <Text
-                style={
-                  this.state.userNameError !== ''
-                    ? styles.inputError
-                    : styles.inputGood
-                }>
-                {this.state.userNameError !== ''
-                  ? this.state.userNameError
-                  : this.state.userNameGood}
-              </Text>
-            </View>
-            <View>
-              <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                style={styles.textInput}
-                onEndEditing={() => this.handleCheckEmail()}
-                keyboardType="email-address"
-                autoCorrect={false}
-                autoCapitalize="none"
-                value={this.state.email}
-                onChangeText={email => this.setState({email, emailError: ''})}
-              />
-              <Text style={styles.inputHelp}>Example: john@company.com</Text>
-              <Text
-                style={
-                  this.state.emailError !== ''
-                    ? styles.inputError
-                    : styles.inputGood
-                }>
-                {this.state.emailError !== ''
-                  ? this.state.emailError
-                  : this.state.emailGood}
-              </Text>
-            </View>
-            <View>
-              <Text style={styles.inputLabel}>Password</Text>
-              <TextInput
-                style={styles.textInput}
-                onEndEditing={() => this.handleCheckPassword()}
-                autoCorrect={false}
-                autoCapitalize="none"
-                secureTextEntry={this.state.hidePassword}
-                value={this.state.password}
-                onChangeText={password =>
-                  this.setState({password, passwordError: ''})
-                }
-              />
-              <TouchableOpacity
-                style={styles.hideShowPassword}
-                onPress={() =>
-                  this.setState({hidePassword: !this.state.hidePassword})
-                }>
-                <Image
-                  source={
-                    this.state.hidePassword
-                      ? require('../assets/img/hide.png')
-                      : require('../assets/img/show.png')
+              <View style={styles.formItem}>
+                <Text style={styles.inputLabel}>Username</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onEndEditing={() => this.handleCheckuserName()}
+                  autoCorrect={false}
+                  autoCapitalize="words"
+                  value={this.state.userName}
+                  onChangeText={userName =>
+                    this.setState({userName, userNameError: ''})
                   }
-                  style={styles.hideShowPasswordImg}
                 />
-              </TouchableOpacity>
-              <Text style={styles.inputHelp}>
-                6+ character, capitals and numbers required
-              </Text>
-              <Text
-                style={
-                  this.state.passwordError !== ''
-                    ? styles.inputError
-                    : styles.inputGood
-                }>
-                {this.state.passwordError !== ''
-                  ? this.state.passwordError
-                  : this.state.passwordGood}
-              </Text>
-            </View>
-            <View>
-              <Text style={styles.inputLabel}>Repeat password</Text>
-              <TextInput
-                style={styles.textInput}
-                onEndEditing={() => this.handleCheckPassword2()}
-                autoCorrect={false}
-                autoCapitalize="none"
-                secureTextEntry={this.state.hideRepeatPassword}
-                value={this.state.password2}
-                onChangeText={password2 =>
-                  this.setState({password2, password2Error: ''})
-                }
-              />
-              <TouchableOpacity
-                style={styles.hideShowPassword}
-                onPress={() =>
-                  this.setState({
-                    hideRepeatPassword: !this.state.hideRepeatPassword,
-                  })
-                }>
-                <Image
-                  source={
-                    this.state.hideRepeatPassword
-                      ? require('../assets/img/hide.png')
-                      : require('../assets/img/show.png')
+                <Text style={styles.inputHelp}>
+                  We'll call you by your username
+                </Text>
+                <Text
+                  style={
+                    this.state.userNameError !== ''
+                      ? styles.inputError
+                      : styles.inputGood
+                  }>
+                  {this.state.userNameError !== ''
+                    ? this.state.userNameError
+                    : this.state.userNameGood}
+                </Text>
+              </View>
+              <View style={styles.formItem}>
+                <Text style={styles.inputLabel}>Email</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onEndEditing={() => this.handleCheckEmail()}
+                  keyboardType="email-address"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={this.state.email}
+                  onChangeText={email => this.setState({email, emailError: ''})}
+                />
+                <Text style={styles.inputHelp}>Example: john@company.com</Text>
+                <Text
+                  style={
+                    this.state.emailError !== ''
+                      ? styles.inputError
+                      : styles.inputGood
+                  }>
+                  {this.state.emailError !== ''
+                    ? this.state.emailError
+                    : this.state.emailGood}
+                </Text>
+              </View>
+              <View style={styles.formItem}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onEndEditing={() => this.handleCheckPassword()}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  secureTextEntry={this.state.hidePassword}
+                  value={this.state.password}
+                  onChangeText={password =>
+                    this.setState({password, passwordError: ''})
                   }
-                  style={styles.hideShowPasswordImg}
                 />
-              </TouchableOpacity>
-              <Text style={styles.inputHelp}>
-                Type that again just to make sure
-              </Text>
-              <Text
-                style={
-                  this.state.password2Error !== ''
-                    ? styles.inputError
-                    : styles.inputGood
-                }>
-                {this.state.password2Error
-                  ? this.state.password2Error
-                  : this.state.password2Good}
-              </Text>
+                <TouchableOpacity
+                  style={styles.hideShowPassword}
+                  onPress={() =>
+                    this.setState({hidePassword: !this.state.hidePassword})
+                  }>
+                  <Image
+                    source={
+                      this.state.hidePassword
+                        ? require('../assets/img/hide.png')
+                        : require('../assets/img/show.png')
+                    }
+                    style={styles.hideShowPasswordImg}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.inputHelp}>
+                  6+ character, capitals and numbers required
+                </Text>
+                <Text
+                  style={
+                    this.state.passwordError !== ''
+                      ? styles.inputError
+                      : styles.inputGood
+                  }>
+                  {this.state.passwordError !== ''
+                    ? this.state.passwordError
+                    : this.state.passwordGood}
+                </Text>
+              </View>
+              <View style={styles.formItem}>
+                <Text style={styles.inputLabel}>Repeat password</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onEndEditing={() => this.handleCheckPassword2()}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  secureTextEntry={this.state.hideRepeatPassword}
+                  value={this.state.password2}
+                  onChangeText={password2 =>
+                    this.setState({password2, password2Error: ''})
+                  }
+                />
+                <TouchableOpacity
+                  style={styles.hideShowPassword}
+                  onPress={() =>
+                    this.setState({
+                      hideRepeatPassword: !this.state.hideRepeatPassword,
+                    })
+                  }>
+                  <Image
+                    source={
+                      this.state.hideRepeatPassword
+                        ? require('../assets/img/hide.png')
+                        : require('../assets/img/show.png')
+                    }
+                    style={styles.hideShowPasswordImg}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.inputHelp}>
+                  Type that again just to make sure
+                </Text>
+                <Text
+                  style={
+                    this.state.password2Error !== ''
+                      ? styles.inputError
+                      : styles.inputGood
+                  }>
+                  {this.state.password2Error
+                    ? this.state.password2Error
+                    : this.state.password2Good}
+                </Text>
+              </View>
             </View>
-          </View>
-          <TouchableOpacity
-            onPress={() => this.handleSubmit()}
-            disabled={this.state.canSubmit ? false : true}
-            style={
-              this.state.canSubmit
-                ? styles.big_button
-                : {...styles.big_button, ...styles.buttonDisabled}
-            }>
-            <Text style={styles.button_text}>Sign up</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+            <TouchableOpacity
+              onPress={() => this.handleSubmit()}
+              disabled={this.state.canSubmit ? false : true}
+              style={
+                this.state.canSubmit
+                  ? styles.big_button
+                  : {...styles.big_button, ...styles.buttonDisabled}
+              }>
+              <Text style={styles.button_text}>Sign up</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  safeView: {flex: 1},
   hideStatusBar: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     paddingBottom: 50,
     flex: 1,
+    marginHorizontal: 20,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  scrollview: {
+    width: '100%',
+    flex: 1,
+  },
+  formItem: {
+    width: '100%',
   },
   inputError: {
     color: 'red',
@@ -356,9 +370,10 @@ const styles = StyleSheet.create({
   textInput: {
     borderBottomWidth: 2,
     borderBottomColor: '#44234C',
-    width: 300,
+    width: '100%',
     marginTop: 10,
     fontSize: 17.5,
+    padding: 0,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
@@ -384,7 +399,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#44234C',
     borderRadius: 5,
-    width: 300,
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -402,7 +417,7 @@ const styles = StyleSheet.create({
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   form: {
-    width: 300,
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',

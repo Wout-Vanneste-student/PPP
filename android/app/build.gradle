@@ -150,10 +150,10 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file('wizer-key.keystore')
-            storePassword 'L1rDJ5jrHRm4Stcn49SVxP97SBpf3oSBzV2Im3nE'
-            keyAlias 'wizer-key'
-            keyPassword 'L1rDJ5jrHRm4Stcn49SVxP97SBpf3oSBzV2Im3nE'
+            storeFile file('keystore.jsk')
+            storePassword '4Kugtk8gD3fN7XNkQRqdw5L6oZRpVUnBi1fNY1do'
+            keyAlias 'upload'
+            keyPassword '4Kugtk8gD3fN7XNkQRqdw5L6oZRpVUnBi1fNY1do'
         }
     }
     buildTypes {
@@ -185,6 +185,8 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation(project(":react-native-google-signin"))
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
 
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
@@ -206,3 +208,4 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+apply plugin: 'com.google.gms.google-services'

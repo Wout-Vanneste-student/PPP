@@ -125,8 +125,8 @@ class Addplanning extends Component {
         AsyncStorage.removeItem('userPlanning');
         AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
         const roundSecondsDate = new Date(new Date(date).setSeconds(0));
-        const test = JSON.stringify(notifKey);
-        this.notif.scheduleNotif(roundSecondsDate, message, test);
+        const uniqueKey = JSON.stringify(notifKey);
+        this.notif.scheduleNotif(roundSecondsDate, message, uniqueKey);
         this.props.action();
       }
     }

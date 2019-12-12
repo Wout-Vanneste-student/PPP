@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import firebase from '../config/Firebase';
+import {Firebase} from '../extensions/wizerCore';
 
 class Signuploading extends Component {
   constructor() {
@@ -27,22 +27,26 @@ class Signuploading extends Component {
   };
 
   componentDidMount() {
-    this.retrieveData();
     this._signUserIn();
   }
 
   _signUserIn = async () => {
-    const storedUsername = await AsyncStorage.getItem('SIGNUP_storedUserName');
-    const storedEmail = await AsyncStorage.getItem('SIGNUP_storedEmail');
-    const storedPassword = await AsyncStorage.getItem('SIGNUP_storedPassword');
-    this.setState({storedUsername, storedEmail, storedPassword});
+    const storedUsername = await AsyncStorage.getItem('SIGNUP_userName');
+    const storedEmail = await AsyncStorage.getItem('SIGNUP_email');
+    const storedPassword = await AsyncStorage.getItem('SIGNUP_password');
+
+    this.setState({
+      username: storedUsername,
+      email: storedEmail,
+      password: storedPassword,
+    });
     if (
       storedUsername !== null &&
       storedEmail !== null &&
       storedPassword !== null
     ) {
       try {
-        const response = await firebase.signupWithEmail(
+        const response = await Firebase.signupWithEmail(
           storedEmail,
           storedPassword,
         );
@@ -52,11 +56,15 @@ class Signuploading extends Component {
           const {username, email, password} = this.state;
           let userData = {email, password, uid};
           const userId = response.user.uid;
+          console.log('userid in signuploading: ', userId);
+          console.log('username in signuploading: ', username);
+          console.log('email in signuploading: ', email);
+          console.log('password in signuploading: ', password);
           AsyncStorage.setItem('userId', JSON.stringify(userId));
           AsyncStorage.setItem('userName', username);
-          await firebase.createNewUser(userData);
+          await Firebase.createNewUser(userData);
           userData = {username, email, password, uid};
-          await firebase.addUserData(uid, userData);
+          await Firebase.addUserData(uid, userData);
         }
       } catch (error) {
         console.log(error.message);
@@ -66,13 +74,11 @@ class Signuploading extends Component {
           AsyncStorage.removeItem('SIGNUP_username');
           AsyncStorage.removeItem('SIGNUP_email');
           AsyncStorage.removeItem('SIGNUP_password');
-          navigate('Planning');
+          navigate('Extensions');
         }
       }
     }
   };
-
-  retrieveData = async () => {};
 
   render() {
     return (

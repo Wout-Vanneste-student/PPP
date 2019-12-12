@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* WizerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* WizerTests.m */; };
 		0C098C660BAF5CF9212AB4E2 /* libPods-WizerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D0291AD4800C3B995DB3B8F /* libPods-WizerTests.a */; };
@@ -12,16 +13,16 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1CF8A3D69A094483A18C0C15 /* Playfair-Display-regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAA46F91B79D4B7D92CA3DB2 /* Playfair-Display-regular.ttf */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* WizerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* WizerTests.m */; };
+		2E708B1F47B341E988F96E35 /* Playfair-Display-bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7A5409A16924FC7B1953340 /* Playfair-Display-bold.ttf */; };
 		549D8F42D3755733AE8C1B45 /* libPods-Wizer-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DD5DCF646B92086A7C45D51B /* libPods-Wizer-tvOSTests.a */; };
 		585A53838482443227BD56AE /* libPods-Wizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32B19CFF3E85B96C52C73B2A /* libPods-Wizer.a */; };
 		6B5ED1DA687DE5EF5CC559E9 /* libPods-Wizer-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F5577FE8BFDEBE0E8BAB210 /* libPods-Wizer-tvOS.a */; };
-		2E708B1F47B341E988F96E35 /* Playfair-Display-bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7A5409A16924FC7B1953340 /* Playfair-Display-bold.ttf */; };
 		B441DE73FD37416AB0D9285E /* Playfair-Display-italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 018E18A34F6F429A9733454C /* Playfair-Display-italic.ttf */; };
-		1CF8A3D69A094483A18C0C15 /* Playfair-Display-regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAA46F91B79D4B7D92CA3DB2 /* Playfair-Display-regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		00E356EE1AD99517003FC87E /* WizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WizerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* WizerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WizerTests.m; sourceTree = "<group>"; };
+		018E18A34F6F429A9733454C /* Playfair-Display-italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Playfair-Display-italic.ttf"; path = "../assets/fonts/Playfair-Display-italic.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Wizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Wizer/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Wizer/AppDelegate.m; sourceTree = "<group>"; };
@@ -63,15 +65,14 @@
 		67FA78FEEB366F1B15E9C873 /* Pods-WizerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WizerTests.release.xcconfig"; path = "Target Support Files/Pods-WizerTests/Pods-WizerTests.release.xcconfig"; sourceTree = "<group>"; };
 		8708E04709B65F6B47826647 /* Pods-Wizer-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wizer-tvOS.release.xcconfig"; path = "Target Support Files/Pods-Wizer-tvOS/Pods-Wizer-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		9D0291AD4800C3B995DB3B8F /* libPods-WizerTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WizerTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7A5409A16924FC7B1953340 /* Playfair-Display-bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Playfair-Display-bold.ttf"; path = "../assets/fonts/Playfair-Display-bold.ttf"; sourceTree = "<group>"; };
 		D65B6DE6E54C284879C87D7A /* Pods-Wizer-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wizer-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Wizer-tvOSTests/Pods-Wizer-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		D8AC3EE218736356FA218C4A /* Pods-Wizer-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wizer-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-Wizer-tvOS/Pods-Wizer-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		DAA46F91B79D4B7D92CA3DB2 /* Playfair-Display-regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Playfair-Display-regular.ttf"; path = "../assets/fonts/Playfair-Display-regular.ttf"; sourceTree = "<group>"; };
 		DD5DCF646B92086A7C45D51B /* libPods-Wizer-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Wizer-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFC050AA3E1A4E2E1F0762A2 /* Pods-WizerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WizerTests.debug.xcconfig"; path = "Target Support Files/Pods-WizerTests/Pods-WizerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		A7A5409A16924FC7B1953340 /* Playfair-Display-bold.ttf */ = {isa = PBXFileReference; name = "Playfair-Display-bold.ttf"; path = "../assets/fonts/Playfair-Display-bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		018E18A34F6F429A9733454C /* Playfair-Display-italic.ttf */ = {isa = PBXFileReference; name = "Playfair-Display-italic.ttf"; path = "../assets/fonts/Playfair-Display-italic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		DAA46F91B79D4B7D92CA3DB2 /* Playfair-Display-regular.ttf */ = {isa = PBXFileReference; name = "Playfair-Display-regular.ttf"; path = "../assets/fonts/Playfair-Display-regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,6 +246,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				2F5CE3A38A2D83B7F03DE48B /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -430,6 +432,30 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		2F5CE3A38A2D83B7F03DE48B /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Wizer/Pods-Wizer-resources.sh",
+				"${PODS_ROOT}/FBSDKCoreKit/FacebookSDKStrings.bundle",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FacebookSDKStrings.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wizer/Pods-Wizer-resources.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		4ACA062A44F586F4876C1818 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

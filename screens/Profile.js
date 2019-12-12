@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import firebase from '../config/Firebase';
+// import firebase from '../config/Firebase';
+import {Firebase} from '../extensions/wizerCore';
 
 class Profile extends Component {
   constructor() {
@@ -33,34 +34,24 @@ class Profile extends Component {
   }
 
   retrieveData = async () => {
-    const currentUserId = await firebase.getCurrentUserId();
-    const currentUserName = await firebase.getCurrentUserName(currentUserId);
-    const userNameStringify = JSON.stringify(currentUserName);
-    const userNameString = userNameStringify.substring(
-      1,
-      userNameStringify.length - 1,
-    );
-    this.setState({userName: userNameString});
-    try {
-      const value = await AsyncStorage.getItem('userName');
-      if (value !== null) {
-        this.setState({username: value});
-      } else {
-        const subThis = JSON.stringify(this.currentUserName);
-        const userName = subThis.substring(1, subThis.length - 1);
-        this.setState({username: userName});
-        AsyncStorage.setItem('userName', userName);
-      }
-    } catch (error) {
-      console.log('error: ', error);
+    const value = await AsyncStorage.getItem('userName');
+    if (value) {
+      this.setState({userName: value});
+    } else {
+      const currentUserId = await Firebase.getCurrentUserId();
+      const currentUserName = await Firebase.getCurrentUserName(currentUserId);
+      const subThis = JSON.stringify(currentUserName);
+      const userName = subThis.substring(1, subThis.length - 1);
+      await AsyncStorage.setItem('userName', userName);
+      this.setState({userName: value});
     }
   };
 
   handleSignout = async () => {
     const {navigate} = this.props.navigation;
-    firebase
-      .signOut()
+    Firebase.signOut()
       .then(AsyncStorage.clear())
+      .then(AsyncStorage.setItem('seenOnboarding', 'true'))
       .then(navigate('Startup'));
   };
 

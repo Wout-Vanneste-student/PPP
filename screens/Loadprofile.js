@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import firebase from '../config/Firebase';
+// import Firebase from '../config/Firebase';
+import {Firebase} from '../extensions/wizerCore';
 
 class Loadprofile extends Component {
   constructor() {
@@ -30,12 +31,38 @@ class Loadprofile extends Component {
   }
 
   _logUserIn = async () => {
+    const fbUser = await AsyncStorage.getItem('facebookToken');
+    if (fbUser) {
+      const result = await Firebase.loginWithFacebook(fbUser);
+      if (result) {
+        const displayname = result.user.displayName.split(' ', 1);
+        const name = displayname[0];
+        await AsyncStorage.setItem('userName', name);
+        let value = await AsyncStorage.getItem('userId');
+        this.currentUserId;
+        if (value) {
+          this.currentUserId = value;
+        } else {
+          value = await Firebase.getCurrentUserId();
+          if (value) {
+            this.currentUserId = value;
+          }
+        }
+        if (this.currentUserId.charAt(0) === '"') {
+          var currentId = value.substring(1, value.length - 1);
+          this.currentUserId = currentId;
+        }
+        this.setState({userFound: true});
+        this.loadUserdata();
+      }
+      return;
+    }
     try {
       const value = await AsyncStorage.getItem('userId');
       if (value !== null) {
         var currentId = value.substring(1, value.length - 1);
         this.currentUserId = currentId;
-        const currentUser = await firebase.getCurrentUserWithId(currentId);
+        const currentUser = await Firebase.getCurrentUserWithId(currentId);
         let email, password, currentData;
         currentUser.forEach(data => {
           switch (data.key) {
@@ -58,7 +85,7 @@ class Loadprofile extends Component {
 
   handleLogin = async (email, password) => {
     try {
-      const response = await firebase.loginWithEmail(email, password);
+      const response = await Firebase.loginWithEmail(email, password);
       if (response.user.uid) {
         this.setState({userFound: true});
       }
@@ -75,7 +102,7 @@ class Loadprofile extends Component {
 
   loadUserdata = async () => {
     const dataList = [];
-    const data = await firebase.getPlanningUser(this.currentUserId);
+    const data = await Firebase.getPlanningUser(this.currentUserId);
     let removeList = [];
     data.forEach(item => {
       const key = item.key;
@@ -108,7 +135,7 @@ class Loadprofile extends Component {
       }
     });
     removeList.forEach(async item => {
-      await firebase.removePlanningItem(this.currentUserId, item.key);
+      await Firebase.removePlanningItem(this.currentUserId, item.key);
     });
     AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
     this.setState({dataFound: true});

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "233359428361",
+    "firebase_url": "https://wizer-personal-assist.firebaseio.com",
+    "project_id": "wizer-personal-assist",
+    "storage_bucket": "wizer-personal-assist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233359428361:android:b7281379159a15651421d8",
+        "android_client_info": {
+          "package_name": "com.wizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "233359428361-qh54r2pbhtaa5df9s9p3rsaa4m5orgku.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wizer",
+            "certificate_hash": "471fd69eef78a04f78cf09cd27f83a29717dff03"
+          }
+        },
+        {
+          "client_id": "233359428361-0cmb49b5u902pupo91kcmfri8g23u3a4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCezwKdFr7n1WPHsEnWCFvScUDKwG8E-9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "233359428361-0cmb49b5u902pupo91kcmfri8g23u3a4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "233359428361-r23p31il8a2dbqhja6o8jilo3nnd5l0o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wizer"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

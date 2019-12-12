@@ -9,8 +9,9 @@ import {
   ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import firebase from '../../config/Firebase';
-import NotificationService from '../../config/Notifications/NotificationService';
+// import firebase from '../../config/Firebase';
+// import NotificationService from '../../config/Notifications/NotificationService';
+import {Firebase, NotificationService} from '../wizerCore';
 import Addplanning from './Addplanning';
 
 class PlanningClass extends Component {
@@ -56,9 +57,9 @@ class PlanningClass extends Component {
   };
 
   reloadPlanningAfterRemove = async () => {
-    const currentUserId = await firebase.getCurrentUserId();
+    const currentUserId = await Firebase.getCurrentUserId();
     const dataList = [];
-    const data = await firebase.getPlanningUser(currentUserId);
+    const data = await Firebase.getPlanningUser(currentUserId);
     let removeList = [];
     data.forEach(item => {
       const key = item.key;
@@ -92,7 +93,7 @@ class PlanningClass extends Component {
     });
     removeList.forEach(async item => {
       console.log('remove: ', item);
-      await firebase.removePlanningItem(this.currentUserId, item.key);
+      await Firebase.removePlanningItem(this.currentUserId, item.key);
     });
     await AsyncStorage.removeItem('userPlanning');
     await AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
@@ -106,8 +107,8 @@ class PlanningClass extends Component {
   handleRemovePlanningItem = async item => {
     this.cancelNotif(item.notificationKey);
 
-    const currentUserId = await firebase.getCurrentUserId();
-    await firebase.removePlanningItem(currentUserId, item.key);
+    const currentUserId = await Firebase.getCurrentUserId();
+    await Firebase.removePlanningItem(currentUserId, item.key);
     this.reloadPlanningAfterRemove();
   };
 
@@ -123,10 +124,7 @@ class PlanningClass extends Component {
         <View>
           {this.state.userPlanning.length === 0 ? (
             <View style={styles.imageView}>
-              <Image
-                source={require('../../assets/img/free.png')}
-                style={styles.freeImg}
-              />
+              <Image source={require('./free.png')} style={styles.freeImg} />
               <Text style={styles.planningHelp}>
                 You're totally free, relax!
               </Text>

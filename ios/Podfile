@@ -35,6 +35,11 @@ target 'Wizer' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'react-native-geolocation', path: '../node_modules/@react-native-community/geolocation'
 
+  pod 'FBSDKCoreKit'
+  pod 'FBSDKLoginKit'
+  pod 'FacebookSDK'
+  pod 'GoogleSignIn'
+  pod 'Firebase/Auth'
 
 
   permissions_path = '../node_modules/react-native-permissions/ios'
@@ -42,6 +47,8 @@ target 'Wizer' do
 
 
   pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios'
+
+
 
   target 'WizerTests' do
     inherit! :search_paths

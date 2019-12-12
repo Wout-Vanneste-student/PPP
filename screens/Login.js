@@ -215,7 +215,6 @@ const styles = StyleSheet.create({
   textInput: {
     borderBottomWidth: 2,
     borderBottomColor: '#44234C',
-    // width: '100%',
     marginTop: 10,
     fontSize: 17.5,
     fontFamily:

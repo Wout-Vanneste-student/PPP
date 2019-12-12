@@ -70,6 +70,7 @@ class Extensions extends Component {
       <>
         <SafeAreaView style={styles.topBar} />
         <SafeAreaView style={styles.hideStatusBar}>
+          <StatusBar barStyle="light-content" />
           {selectedExtension !== null ? (
             <View style={styles.topFlex}>
               <TouchableOpacity
