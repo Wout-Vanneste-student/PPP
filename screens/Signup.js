@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 7.5,
-    paddingBottom: 12.5,
+    paddingBottom: Platform.OS === 'android' ? 12.5 : 7.5,
     marginTop: 20,
   },
   buttonDisabled: {
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   hideShowPassword: {
     position: 'absolute',
     right: 3,
-    top: 35,
+    bottom: 50,
     height: 40,
     width: 35,
     padding: 2,

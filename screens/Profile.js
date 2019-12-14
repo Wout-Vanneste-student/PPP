@@ -37,7 +37,7 @@ class Profile extends Component {
     if (value) {
       this.setState({userName: value});
     } else {
-      const currentUserId = await Firebase.getCurrentUserId();
+      const currentUserId = await AsyncStorage.getItem('currentUserId');
       const currentUserName = await Firebase.getCurrentUserName(currentUserId);
       const subThis = JSON.stringify(currentUserName);
       const userName = subThis.substring(1, subThis.length - 1);
@@ -50,7 +50,6 @@ class Profile extends Component {
     const {navigate} = this.props.navigation;
     Firebase.signOut()
       .then(AsyncStorage.clear())
-      .then(AsyncStorage.setItem('seenOnboarding', 'true'))
       .then(navigate('Startup'));
   };
 
@@ -61,6 +60,10 @@ class Profile extends Component {
         <SafeAreaView style={styles.hideStatusBar}>
           <StatusBar barStyle="light-content" />
           <Text style={styles.headerText}>Hello {this.state.userName}</Text>
+          <Text style={styles.didYouKnow}>
+            Did you know... {'\n'} {'\n'} "Strengths" is the longest word in the
+            English language with one vowel?
+          </Text>
           <View>
             <Text style={styles.thankDesigner}>
               I have to thank the illustrator that provided the free to use
@@ -117,6 +120,16 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 25,
+    color: '#44234C',
+    textAlign: 'center',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+    marginBottom: 75,
+    marginTop: 50,
+  },
+
+  didYouKnow: {
+    fontSize: 17,
     color: '#44234C',
     textAlign: 'center',
     fontFamily:

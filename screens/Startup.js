@@ -7,9 +7,10 @@ import {
   StatusBar,
   Image,
   View,
-  AsyncStorage,
   TouchableOpacity,
 } from 'react-native';
+
+import AsyncStorage from '@react-native-community/async-storage';
 import {Firebase} from '../extensions/wizerCore';
 
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
@@ -30,7 +31,7 @@ class Startup extends Component {
   };
 
   componentDidMount() {
-    this.getLoggenInUser();
+    // this.getLoggenInUser();
   }
 
   getLoggenInUser = async () => {
@@ -39,44 +40,52 @@ class Startup extends Component {
       const {navigate} = this.props.navigation;
       navigate('Loadprofile');
     }
-    const value = await AsyncStorage.getItem('userId');
+    const value = await AsyncStorage.getItem('currentUserId');
     if (value !== null) {
       const {navigate} = this.props.navigation;
       navigate('Loadprofile');
     }
   };
   handleLoginWithFacebook = async () => {
-    await LoginManager.logInWithPermissions(['email', 'public_profile']).then(
-      function(result) {
-        if (result.isCancelled) {
-          console.log('Login cancelled');
-        } else {
-          AccessToken.getCurrentAccessToken().then(async data => {
-            const token = data.accessToken.toString();
-            if (token) {
-              const fbResult = await Firebase.loginWithFacebook(token);
-              if (fbResult) {
-                const displayname = fbResult.user.displayName.split(' ', 1);
-                const email = fbResult.user.email;
-                const uid = fbResult.user.uid;
-                const username = displayname[0];
-                await AsyncStorage.setItem('userName', username);
-                let userData = {email, uid};
-                await Firebase.createNewUser(userData);
-                userData = {username, email, uid};
-                await Firebase.addUserData(uid, userData);
+    let canLogin = false;
+    await LoginManager.logInWithPermissions(['email', 'public_profile'])
+      .then(
+        async function(result) {
+          if (result.isCancelled) {
+            console.log('Login cancelled');
+          } else {
+            await AccessToken.getCurrentAccessToken().then(async data => {
+              const token = data.accessToken.toString();
+              if (token) {
+                const fbResult = await Firebase.loginWithFacebook(token);
+                if (fbResult) {
+                  const displayname = fbResult.user.displayName.split(' ', 1);
+                  const email = fbResult.user.email;
+                  const uid = fbResult.user.uid;
+                  const username = displayname[0];
+                  await AsyncStorage.setItem('userName', username);
+                  let userData = {email, uid};
+                  await Firebase.createNewUser(userData);
+                  userData = {username, email, uid};
+                  await Firebase.addUserData(uid, userData);
+                }
+                await AsyncStorage.setItem('facebookToken', token);
+                canLogin = true;
+              } else {
               }
-              await AsyncStorage.setItem('facebookToken', token);
-            }
-          });
+            });
+          }
+        },
+        function(error) {
+          console.log('Login fail with error: ' + error);
+        },
+      )
+      .then(() => {
+        if (canLogin) {
+          const {navigate} = this.props.navigation;
+          navigate('Loadprofile');
         }
-      },
-      function(error) {
-        console.log('Login fail with error: ' + error);
-      },
-    );
-    const {navigate} = this.props.navigation;
-    navigate('Loadprofile');
+      });
   };
 
   handleLoginWithGoogle = async () => {

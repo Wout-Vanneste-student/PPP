@@ -53,13 +53,13 @@ class Signuploading extends Component {
         if (response.user.uid) {
           this.setState({userFound: true});
           const {uid} = response.user;
-          const {username, email, password} = this.state;
-          let userData = {email, password, uid};
+          const {username, email} = this.state;
+          let userData = {email, uid};
           const userId = response.user.uid;
-          AsyncStorage.setItem('userId', JSON.stringify(userId));
+          AsyncStorage.setItem('currentUserId', JSON.stringify(userId));
           AsyncStorage.setItem('userName', username);
           await Firebase.createNewUser(userData);
-          userData = {username, email, password, uid};
+          userData = {username, email, uid};
           await Firebase.addUserData(uid, userData);
         }
       } catch (error) {

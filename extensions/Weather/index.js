@@ -6,11 +6,10 @@ import {
   Platform,
   StatusBar,
   ActivityIndicator,
-  SafeAreaView,
   Image,
 } from 'react-native';
 
-import {API_KEY} from './openWeatherApi';
+import {WEATHER_API_KEY} from '../wizerCore';
 
 import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
@@ -54,7 +53,7 @@ class WeatherClass extends Component {
 
   extensionIcon = () => {
     const icons = {
-      icon: require('../Weather/icon.png'),
+      icon: require('./icon.png'),
     };
     return icons.icon;
   };
@@ -65,7 +64,7 @@ class WeatherClass extends Component {
 
   fetchWeather = (lat = 50.9, lon = 3.3) => {
     fetch(
-      `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${API_KEY}&units=metric`,
+      `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}&units=metric`,
     )
       .then(res => res.json())
       .then(json => {
@@ -159,12 +158,12 @@ class WeatherClass extends Component {
       humidity,
     } = this.state;
     return isLoading === true ? (
-      <SafeAreaView style={styles.hideStatusBar}>
+      <View style={styles.hideStatusBar}>
         <Text style={styles.loadingText}>Weather is loading</Text>
         <ActivityIndicator size="large" color="#44234C" />
-      </SafeAreaView>
+      </View>
     ) : (
-      <SafeAreaView style={styles.hideStatusBar}>
+      <View style={styles.hideStatusBar}>
         <WeatherItem
           condition={weatherCondition}
           city={city}
@@ -174,7 +173,7 @@ class WeatherClass extends Component {
           maxTemp={maxTemp}
           humidity={humidity}
         />
-      </SafeAreaView>
+      </View>
     );
   }
 }
@@ -259,7 +258,7 @@ const WeatherItem = ({
       <View style={styles.currentWeather}>
         <View
           style={[styles.currentWeatherFlex, styles.currentWeatherFlexLeft]}>
-          <Text style={styles.tempText}>{tempRounded}</Text>
+          <Text style={styles.tempText}>{tempRounded}°</Text>
           <Text style={styles.locationText}>In {city}</Text>
         </View>
         <View
@@ -299,9 +298,13 @@ const styles = StyleSheet.create({
   },
   currentWeatherFlexRight: {
     marginRight: 15,
+    display: 'flex',
+    justifyContent: 'space-between',
   },
   currentWeatherFlexLeft: {
     marginLeft: 15,
+    display: 'flex',
+    justifyContent: 'space-between',
   },
   currentWeatherFlex: {
     alignItems: 'center',
@@ -338,63 +341,15 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
-  // weatherImgCircle: {
-  //   width: 80,
-  //   height: 80,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   backgroundColor: 'white',
-  //   borderRadius: 50,
-  // },
-  // weatherImgView: {
-  //   display: 'flex',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  // },
-  // weatherContainer: {
-  //   flex: 1,
-  // },
-  // headerContainer: {
-  //   paddingTop: 50,
-  //   flex: 1,
-  //   flexDirection: 'column',
-  //   alignItems: 'center',
-  //   justifyContent: 'space-around',
-  // },
-
-  // loadingText: {
-  //   fontSize: 25,
-  //   color: '#44234C',
-  //   textAlign: 'center',
-  //   fontFamily:
-  //     Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-  //   marginBottom: 75,
-  //   marginTop: 50,
-  // },
-  // title: {
-  //   fontSize: 35,
-  //   color: '#44234C',
-  //   fontFamily:
-  //     Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-  // },
-  // subtitle: {
-  //   fontSize: 15,
-  //   marginLeft: 20,
-  //   color: '#44234C',
-  //   fontFamily:
-  //     Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-  // },
-  // weatherImgBackground: {
-  //   width: '100%',
-  //   paddingTop: 10,
-  //   paddingBottom: Platform.OS === 'android' ? 15 : 10,
-  //   // backgroundColor: '#44234C',
-  //   borderRadius: 100,
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-around',
-  //   alignItems: 'center',
-  //   marginBottom: 10,
-  // },
+  loadingText: {
+    fontSize: 25,
+    color: '#44234C',
+    textAlign: 'center',
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+    marginBottom: 75,
+    marginTop: 50,
+  },
 });
 
 export default WeatherClass;

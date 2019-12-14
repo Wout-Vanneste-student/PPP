@@ -32,12 +32,12 @@ class Loadprofile extends Component {
     const fbUser = await AsyncStorage.getItem('facebookToken');
     if (fbUser) {
       await Firebase.loginWithFacebook(fbUser);
-      this.currentUserId = await Firebase.getCurrentUserId();
+      this.currentUserId = await AsyncStorage.getItem('currentUserId');
       this.setState({userFound: true});
       this.loadUserdata();
     }
     try {
-      const value = await AsyncStorage.getItem('userId');
+      const value = await AsyncStorage.getItem('currentUserId');
       if (value !== null) {
         var currentId = value.substring(1, value.length - 1);
         this.currentUserId = currentId;
@@ -69,7 +69,7 @@ class Loadprofile extends Component {
         this.setState({userFound: true});
       }
       const userId = response.user.uid;
-      AsyncStorage.setItem('userId', JSON.stringify(userId));
+      AsyncStorage.setItem('currentUserId', JSON.stringify(userId));
     } catch (error) {
       console.log('error: ', error);
     } finally {
@@ -108,7 +108,7 @@ class Loadprofile extends Component {
         notificationDate,
         notificationKey,
       };
-      if (new Date().getTime() > checkDate.getTime() + 500) {
+      if (new Date().getTime() > checkDate.getTime()) {
         removeList.push(toAddItem);
       } else {
         dataList.push(toAddItem);
@@ -119,7 +119,7 @@ class Loadprofile extends Component {
       const pastKey = pastItem.key;
       const pastItemString = JSON.stringify(pastItem);
       const pastItemArray = JSON.parse(pastItemString);
-      const pastMessage = pastItemArray.pastItemMessage;
+      const pastMessage = pastItemArray.pastMessage;
       const pastDate = pastItemArray.pastItemDate;
       const toAddPastItem = {
         pastKey,
@@ -128,14 +128,16 @@ class Loadprofile extends Component {
       };
       pastList.push(toAddPastItem);
     });
-    const currentUserId = await Firebase.getCurrentUserId();
+    const currentUserId = await AsyncStorage.getItem('currentUserId');
     removeList.forEach(async item => {
-      const pastItemMessage = item.notificationMessage;
+      const pastMessage = item.notificationMessage;
       const pastItemDate = item.notificationDate;
-      const pastItem = {pastItemMessage, pastItemDate};
+      const pastItem = {pastMessage, pastItemDate};
       await Firebase.addPastItem(currentUserId, pastItem);
       await Firebase.removePlanningItem(currentUserId, item.key);
     });
+    await AsyncStorage.removeItem('userPlanning');
+    await AsyncStorage.removeItem('pastPlanning');
     await AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
     await AsyncStorage.setItem('pastPlanning', JSON.stringify(pastList));
     this.setState({dataFound: true});

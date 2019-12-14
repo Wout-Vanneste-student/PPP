@@ -19,9 +19,7 @@ class Extensions extends Component {
     super(props);
     this.state = {
       selectedExtension: null,
-      extensionsList: Object.keys(ExtensionList).map(function(key) {
-        return [String(key), ExtensionList[key]];
-      }),
+      extensionsList: null,
     };
   }
 
@@ -33,8 +31,8 @@ class Extensions extends Component {
         {this.state.extensionsList.map((item, i) => {
           const extensionIcon = new ExtensionList[item[0]]().extensionIcon();
           let name = item[0];
-          if (name.length > 11) {
-            name = name.substr(0, 9) + '...';
+          if (name.length > 13) {
+            name = name.substr(0, 10) + '...';
           }
           return (
             <TouchableOpacity
@@ -54,6 +52,23 @@ class Extensions extends Component {
     );
   };
 
+  componentDidMount() {
+    this.getExtensions();
+  }
+
+  getExtensions = () => {
+    const check = Object.keys(ExtensionList).map(function(key) {
+      return [String(key), ExtensionList[key]];
+    });
+    if (check[0][0] !== 'default') {
+      this.setState({
+        extensionsList: Object.keys(ExtensionList).map(function(key) {
+          return [String(key), ExtensionList[key]];
+        }),
+      });
+    }
+  };
+
   renderExtensions = () => {
     if (this.state.selectedExtension === null) {
       return this.extensionsView();
@@ -65,38 +80,48 @@ class Extensions extends Component {
   };
 
   render() {
-    const {selectedExtension} = this.state;
+    const {extensionsList, selectedExtension} = this.state;
     return (
       <>
         <SafeAreaView style={styles.topBar} />
         <SafeAreaView style={styles.hideStatusBar}>
           <StatusBar barStyle="light-content" />
-          {selectedExtension !== null ? (
-            <View style={styles.topFlex}>
-              <TouchableOpacity
-                style={styles.goBack}
-                onPress={() => this.setState({selectedExtension: null})}>
-                <Image
-                  style={styles.goBackArrow}
-                  source={require('../assets/img/arrow.png')}
-                />
-                <Text style={styles.goBackText}>Extensions</Text>
-              </TouchableOpacity>
-              <Image
-                source={require('../assets/img/wizer_dark.png')}
-                style={styles.brandingImage}
-              />
-            </View>
+          {extensionsList === null ? (
+            <Text style={styles.noExtensions}>
+              There were no extensions found
+            </Text>
           ) : (
-            <View style={styles.topFlex}>
-              <Text style={styles.extenionsTitle}>Extensions</Text>
-              <Image
-                source={require('../assets/img/wizer_dark.png')}
-                style={styles.brandingImage}
-              />
-            </View>
+            <>
+              {selectedExtension !== null ? (
+                <View style={styles.topFlex}>
+                  <TouchableOpacity
+                    style={styles.goBack}
+                    onPress={() => this.setState({selectedExtension: null})}>
+                    <Image
+                      style={styles.goBackArrow}
+                      source={require('../assets/img/arrow.png')}
+                    />
+                    <Text style={styles.goBackText}>Extensions</Text>
+                  </TouchableOpacity>
+                  <Image
+                    source={require('../assets/img/wizer_dark.png')}
+                    style={styles.brandingImage}
+                  />
+                </View>
+              ) : (
+                <View style={styles.topFlex}>
+                  <Text style={styles.extenionsTitle}>Extensions</Text>
+                  <Image
+                    source={require('../assets/img/wizer_dark.png')}
+                    style={styles.brandingImage}
+                  />
+                </View>
+              )}
+              <View style={styles.extensionView}>
+                {this.renderExtensions()}
+              </View>
+            </>
           )}
-          <View style={styles.extensionView}>{this.renderExtensions()}</View>
         </SafeAreaView>
       </>
     );
@@ -107,20 +132,29 @@ const styles = StyleSheet.create({
   extensionsGrid: {
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'space-between',
     flexWrap: 'wrap',
+  },
+  noExtensions: {
+    color: '#44234C',
+    fontSize: 17,
+    marginTop: 50,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+    textAlign: 'center',
   },
   topBar: {
     flex: 0,
     backgroundColor: '#44234C',
   },
   hideStatusBar: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 15,
     flex: 1,
     marginHorizontal: 20,
   },
   extensionButton: {
     padding: 5,
-    width: 96,
+    width: 90,
     height: 80,
     display: 'flex',
     justifyContent: 'space-between',
@@ -135,7 +169,7 @@ const styles = StyleSheet.create({
   },
   extensionName: {
     color: '#44234C',
-    fontSize: 15,
+    fontSize: 13,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     textAlign: 'right',

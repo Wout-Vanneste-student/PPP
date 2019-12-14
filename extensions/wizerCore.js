@@ -14,10 +14,20 @@ export const Firebase = {
   // },
   loginWithFacebook: token => {
     const credential = firebase.auth.FacebookAuthProvider.credential(token);
-    return firebase.auth().signInWithCredential(credential);
+    firebase
+      .auth()
+      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .then(() => {
+        return firebase.auth().signInWithCredential(credential);
+      });
   },
   loginWithEmail: (email, password) => {
-    return firebase.auth().signInWithEmailAndPassword(email, password);
+    firebase
+      .auth()
+      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .then(() => {
+        return firebase.auth().signInWithEmailAndPassword(email, password);
+      });
   },
   signupWithEmail: (email, password) => {
     return firebase.auth().createUserWithEmailAndPassword(email, password);
@@ -110,6 +120,12 @@ export const Firebase = {
       .ref('users/' + userId + '/pastItems/' + itemId)
       .remove();
   },
+  removeAllPastItems: userId => {
+    return firebase
+      .database()
+      .ref('users/' + userId + '/pastItems')
+      .remove();
+  },
 };
 
 export const NotificationService = class NotifService {
@@ -156,3 +172,5 @@ export const NotificationService = class NotifService {
     });
   }
 };
+
+export const WEATHER_API_KEY = 'b108b94a6a4f689e72be20fa2728123d';

@@ -10,8 +10,6 @@ import {
   ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-// import firebase from '../../config/Firebase';
-// import NotificationService from '../../config/Notifications/NotificationService';
 import {Firebase, NotificationService} from '../wizerCore';
 import Addplanning from './Addplanning';
 
@@ -25,12 +23,11 @@ class PlanningClass extends Component {
     };
     this.notif = new NotificationService();
     this.addItem = this.addItem.bind(this);
-    // this.extensionIcon = this.extensionIcon.bind(this);
   }
 
   extensionIcon = () => {
     const icons = {
-      icon: require('../Planning/icon.png'),
+      icon: require('./icon.png'),
     };
     return icons.icon;
   };
@@ -59,7 +56,7 @@ class PlanningClass extends Component {
   };
 
   reloadPlanning = async () => {
-    const currentUserId = await Firebase.getCurrentUserId();
+    const currentUserId = await AsyncStorage.getItem('currentUserId');
     const dataList = [];
     const data = await Firebase.getPlanningUser(currentUserId);
     let removeList = [];
@@ -87,16 +84,16 @@ class PlanningClass extends Component {
         notificationDate,
         notificationKey,
       };
-      if (new Date().getTime() > checkDate.getTime() + 500) {
+      if (new Date().getTime() > checkDate.getTime()) {
         removeList.push(toAddItem);
       } else {
         dataList.push(toAddItem);
       }
     });
     removeList.forEach(async item => {
-      const pastItemMessage = item.notificationMessage;
+      const pastMessage = item.notificationMessage;
       const pastItemDate = item.notificationDate;
-      const pastItem = {pastItemMessage, pastItemDate};
+      const pastItem = {pastMessage, pastItemDate};
       await Firebase.addPastItem(currentUserId, pastItem);
       await Firebase.removePlanningItem(currentUserId, item.key);
     });
@@ -110,9 +107,8 @@ class PlanningClass extends Component {
   };
 
   handleRemovePlanningItem = async item => {
-    console.log('item remove', item);
     this.cancelNotif(item.notificationKey);
-    const currentUserId = await Firebase.getCurrentUserId();
+    const currentUserId = await AsyncStorage.getItem('currentUserId');
     await Firebase.removePlanningItem(currentUserId, item.key);
     this.reloadPlanning();
   };
@@ -123,13 +119,13 @@ class PlanningClass extends Component {
 
   reloadPastPlanning = async () => {
     const pastList = [];
-    const currentUserId = await Firebase.getCurrentUserId();
+    const currentUserId = await AsyncStorage.getItem('currentUserId');
     const pastData = await Firebase.getPastPlanningUser(currentUserId);
     pastData.forEach(pastItem => {
       const pastKey = pastItem.key;
       const pastItemString = JSON.stringify(pastItem);
       const pastItemArray = JSON.parse(pastItemString);
-      const pastMessage = pastItemArray.pastItemMessage;
+      const pastMessage = pastItemArray.pastMessage;
       const pastDate = pastItemArray.pastItemDate;
       const toAddPastItem = {
         pastKey,
@@ -138,6 +134,7 @@ class PlanningClass extends Component {
       };
       pastList.push(toAddPastItem);
     });
+    await AsyncStorage.removeItem('pastPlanning');
     await AsyncStorage.setItem('pastPlanning', JSON.stringify(pastList));
   };
 
@@ -154,39 +151,36 @@ class PlanningClass extends Component {
     ) : (
       <View style={styles.planningWrapper}>
         <View>
-          {this.state.userPlanning.length === 0 ? (
-            <View style={styles.imageView}>
-              <Image source={require('./free.png')} style={styles.freeImg} />
-              <Text style={styles.planningHelp}>
-                You're totally free, relax!
-              </Text>
-            </View>
-          ) : (
-            <>
-              <View style={styles.planningHeader}>
-                <Text style={styles.planningHeaderText}>
-                  This is your upcoming planning
+          <ScrollView
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scrollViewFlex}
+            showsVerticalScrollIndicator={
+              this.state.userPlanning.length === 0 ? false : true
+            }
+            style={styles.scrollview}
+            refreshControl={
+              <RefreshControl
+                onRefresh={this.onRefresh}
+                refreshing={this.state.refreshing}
+                colors={['#44234C']}
+                tintColor="#44234C"
+              />
+            }>
+            {this.state.userPlanning.length === 0 ? (
+              <View style={styles.imageView}>
+                <Image source={require('./free.png')} style={styles.freeImg} />
+                <Text style={styles.planningHelp}>
+                  You're totally free, relax!
                 </Text>
               </View>
-              <ScrollView
-                showsHorizontalScrollIndicator={false}
-                style={styles.scrollview}
-                refreshControl={
-                  <RefreshControl
-                    onRefresh={this.onRefresh}
-                    refreshing={this.state.refreshing}
-                  />
-                }>
-                <UserPlanning
-                  data={this.state.userPlanning}
-                  handleRemovePlanningItem={this.handleRemovePlanningItem}
-                />
-              </ScrollView>
-              <Text style={styles.planningHelp}>
-                You can scroll through your planning.
-              </Text>
-            </>
-          )}
+            ) : (
+              <UserPlanning
+                style={styles.userplanning}
+                data={this.state.userPlanning}
+                handleRemovePlanningItem={this.handleRemovePlanningItem}
+              />
+            )}
+          </ScrollView>
         </View>
         <TouchableOpacity
           style={styles.big_button}
@@ -201,41 +195,64 @@ class PlanningClass extends Component {
 const UserPlanning = ({data, handleRemovePlanningItem}) => {
   return (
     <>
-      {data.map((item, i) => {
-        return (
-          <View
-            style={
-              i === data.length - 1
-                ? styles.planningItem
-                : [styles.planningItem, styles.planningItemBorder]
-            }
-            key={i}>
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => handleRemovePlanningItem(item)}>
-              <Image
-                style={styles.removeImage}
-                source={require('../../assets/img/trashcan.png')}
-              />
-            </TouchableOpacity>
-            <View>
-              <Text style={styles.planningDate}>{item.notificationDate}</Text>
-              <View style={styles.flexshrink}>
-                <Text style={styles.planningText}>
-                  {item.notificationMessage}
-                </Text>
+      <View style={styles.planningHeader}>
+        <Text style={styles.planningHeaderText}>
+          This is your upcoming planning
+        </Text>
+      </View>
+      <View style={styles.planningStyle}>
+        {data.map((item, i) => {
+          return (
+            <View
+              style={
+                i === data.length - 1
+                  ? styles.planningItem
+                  : [styles.planningItem, styles.planningItemBorder]
+              }
+              key={i}>
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => handleRemovePlanningItem(item)}>
+                <Image
+                  style={styles.removeImage}
+                  source={require('./trashcan.png')}
+                />
+              </TouchableOpacity>
+              <View>
+                <Text style={styles.planningDate}>{item.notificationDate}</Text>
+                <View style={styles.flexshrink}>
+                  <Text style={styles.planningText}>
+                    {item.notificationMessage}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
-        );
-      })}
+          );
+        })}
+      </View>
+      <Text style={styles.planningHelp}>
+        You can scroll through your planning.
+      </Text>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  flexshrink: {flexShrink: 1},
-  scrollview: {height: '65%'},
+  planningStyle: {
+    flex: 1,
+    height: '100%',
+  },
+  flexshrink: {
+    flexShrink: 1,
+  },
+  scrollview: {
+    height: '80%',
+  },
+  scrollViewFlex: {
+    display: 'flex',
+    height: '100%',
+    justifyContent: 'space-between',
+  },
   planningWrapper: {
     display: 'flex',
     height: '100%',
@@ -309,6 +326,7 @@ const styles = StyleSheet.create({
   planningItem: {
     marginBottom: 15,
     display: 'flex',
+    justifyContent: 'flex-start',
     flexDirection: 'row',
     paddingBottom: 15,
   },
@@ -322,9 +340,9 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 17.5,
-    flex: 1,
-    flexWrap: 'wrap',
-    marginRight: 35,
+    // flex: 1,
+    // flexWrap: 'wrap',
+    // marginRight: 35,
   },
   removeButton: {
     marginRight: 15,

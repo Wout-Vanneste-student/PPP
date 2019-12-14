@@ -24,6 +24,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    this.reloadPastPlanning();
     this.getPastPlanning();
   }
 
@@ -35,18 +36,62 @@ class Home extends Component {
   };
 
   onRefresh = () => {
+    this.reloadPastPlanning();
     this.getPastPlanning();
   };
 
   reloadPastPlanning = async () => {
     const pastList = [];
-    const currentUserId = await Firebase.getCurrentUserId();
+    const currentUserId = await AsyncStorage.getItem('currentUserId');
+
+    const dataList = [];
+    const data = await Firebase.getPlanningUser(currentUserId);
+    let removeList = [];
+    data.forEach(item => {
+      const key = item.key;
+      const itemStringify = JSON.stringify(item);
+      const itemArray = JSON.parse(itemStringify);
+      const notificationMessage = itemArray.notifMessage;
+      const notificationDate = itemArray.notifDate;
+      const notificationKey = itemArray.notifKey;
+      const notifDateString = JSON.stringify(notificationDate);
+      const dateDay = notifDateString.substring(1, 3);
+      const dateMonth = notifDateString.substring(4, 6);
+      const dateYear = notifDateString.substring(7, 11);
+      const dateHours = notifDateString.substring(15, 17);
+      const dateMinutes = notifDateString.substring(18, 20);
+      const dateFormat = dateYear + '/' + dateMonth + '/' + dateDay;
+      let checkDate = new Date(dateFormat);
+      checkDate.setSeconds(0);
+      checkDate.setMinutes(dateMinutes);
+      checkDate.setHours(dateHours);
+      const toAddItem = {
+        key,
+        notificationMessage,
+        notificationDate,
+        notificationKey,
+      };
+      if (new Date().getTime() > checkDate.getTime()) {
+        removeList.push(toAddItem);
+      } else {
+        dataList.push(toAddItem);
+      }
+    });
+    removeList.forEach(async item => {
+      const pastMessage = item.notificationMessage;
+      const pastItemDate = item.notificationDate;
+      const pastItem = {pastMessage, pastItemDate};
+      await Firebase.addPastItem(currentUserId, pastItem);
+      await Firebase.removePlanningItem(currentUserId, item.key);
+    });
+    await AsyncStorage.removeItem('userPlanning');
+    await AsyncStorage.setItem('userPlanning', JSON.stringify(dataList));
     const pastData = await Firebase.getPastPlanningUser(currentUserId);
     pastData.forEach(pastItem => {
       const pastKey = pastItem.key;
       const pastItemString = JSON.stringify(pastItem);
       const pastItemArray = JSON.parse(pastItemString);
-      const pastMessage = pastItemArray.pastItemMessage;
+      const pastMessage = pastItemArray.pastMessage;
       const pastDate = pastItemArray.pastItemDate;
       const toAddPastItem = {
         pastKey,
@@ -55,12 +100,20 @@ class Home extends Component {
       };
       pastList.push(toAddPastItem);
     });
+    await AsyncStorage.removeItem('pastPlanning');
     await AsyncStorage.setItem('pastPlanning', JSON.stringify(pastList));
   };
 
   handleRemoveItem = async item => {
-    const currentUserId = await Firebase.getCurrentUserId();
+    const currentUserId = await AsyncStorage.getItem('currentUserId');
     await Firebase.removePastItem(currentUserId, item.pastKey);
+    await this.reloadPastPlanning();
+    this.getPastPlanning();
+  };
+
+  handleRemoveAllItems = async () => {
+    const currentUserId = await AsyncStorage.getItem('currentUserId');
+    await Firebase.removeAllPastItems(currentUserId);
     await this.reloadPastPlanning();
     this.getPastPlanning();
   };
@@ -71,12 +124,13 @@ class Home extends Component {
         <SafeAreaView style={styles.topBar} />
         <SafeAreaView style={styles.hideStatusBar}>
           <StatusBar barStyle="light-content" />
-
           <View style={styles.planningWrapper}>
             <ScrollView
-              style={styles.scrollview}
+              contentContainerStyle={styles.scrollview}
               refreshControl={
                 <RefreshControl
+                  colors={['#44234C']}
+                  tintColor="#44234C"
                   onRefresh={this.onRefresh}
                   refreshing={this.state.refreshing}
                 />
@@ -92,16 +146,23 @@ class Home extends Component {
                   </Text>
                 </View>
               ) : (
-                <>
-                  <Text>
-                    Here you find your planning items that have been done, are
-                    you ready to get rid of them forever?
-                  </Text>
-                  <PastPlanning
-                    data={this.state.pastItems}
-                    handleRemoveItem={this.handleRemoveItem}
-                  />
-                </>
+                <View style={styles.homeFlex}>
+                  <View>
+                    <Text style={styles.itemsTitle}>
+                      Here are your past reminders. {'\n'} Ready to get rid of
+                      them forever?
+                    </Text>
+                    <PastPlanning
+                      data={this.state.pastItems}
+                      handleRemoveItem={this.handleRemoveItem}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    onPress={this.handleRemoveAllItems}
+                    style={styles.big_button}>
+                    <Text style={styles.buttonText}>Remove all items</Text>
+                  </TouchableOpacity>
+                </View>
               )}
             </ScrollView>
           </View>
@@ -149,16 +210,33 @@ const styles = StyleSheet.create({
     flex: 0,
     backgroundColor: '#44234C',
   },
+  homeFlex: {
+    flex: 1,
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  itemsTitle: {
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-bold',
+    color: '#44234C',
+    textAlign: 'center',
+    fontSize: 17.5,
+    marginTop: Platform.OS === 'android' ? 0 : 15,
+    lineHeight: 30,
+    marginBottom: 25,
+  },
   hideStatusBar: {
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     flex: 1,
     marginHorizontal: 20,
   },
   flexshrink: {flexShrink: 1},
-  scrollview: {height: '70%'},
+  scrollview: {height: '100%', flex: 1},
   planningWrapper: {
     display: 'flex',
     height: '100%',
+    flex: 1,
     justifyContent: 'space-between',
   },
   planningItemBorder: {
@@ -188,7 +266,6 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 17.5,
-    flex: 1,
     flexWrap: 'wrap',
     marginRight: 35,
   },
@@ -215,6 +292,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 50,
+  },
+  big_button: {
+    borderWidth: 2,
+    borderColor: '#44234C',
+    borderRadius: 5,
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 5,
+    paddingBottom: Platform.OS === 'android' ? 10 : 5,
+    alignSelf: 'center',
+    marginBottom: 25,
+  },
+  buttonText: {
+    color: '#44234C',
+    fontSize: 20,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
 });
 

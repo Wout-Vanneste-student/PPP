@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import AppIntroSlider from 'react-native-app-intro-slider';
+import * as firebase from 'firebase';
 
 import {
   SafeAreaView,
@@ -31,20 +32,28 @@ class Onboarding extends Component {
   static navigationOptions = {
     header: null,
   };
+
   componentDidMount() {
-    this.retrieveData();
+    this.checkLoggedInUser();
   }
 
-  retrieveData = async () => {
-    const {navigate} = this.props.navigation;
-    const seen = await AsyncStorage.getItem('seenOnboarding');
-    const user = await AsyncStorage.getItem('userId');
-    if (seen !== null && user === null) {
-      navigate('Startup');
-    } else if (seen !== null && user !== null) {
-      navigate('Loadprofile');
+  checkLoggedInUser = async () => {
+    const response = await firebase
+      .auth()
+      .onAuthStateChanged(async function(user) {
+        if (user) {
+          await AsyncStorage.setItem('currentUserId', user.uid);
+          return true;
+        } else {
+          return false;
+        }
+      });
+    if (response) {
+      const {navigate} = this.props.navigation;
+      navigate('Home');
     }
   };
+
   _renderItem = ({item}) => {
     return (
       <View style={styles.onboardingView}>
@@ -59,7 +68,6 @@ class Onboarding extends Component {
   };
 
   _onDone = () => {
-    AsyncStorage.setItem('seenOnboarding', 'true');
     const {navigate} = this.props.navigation;
     navigate('Startup');
   };

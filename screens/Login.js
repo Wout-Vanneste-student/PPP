@@ -49,7 +49,7 @@ class Login extends Component {
         this.setState({userFound: true});
       }
       const userId = response.user.uid;
-      AsyncStorage.setItem('userId', JSON.stringify(userId));
+      AsyncStorage.setItem('currentUserId', JSON.stringify(userId));
     } catch (error) {
       /*
       Currently the error message gets shown to the user
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 7.5,
-    paddingBottom: 12.5,
+    paddingBottom: Platform.OS === 'android' ? 12.5 : 7.5,
   },
   buttonContainer: {
     paddingHorizontal: 20,

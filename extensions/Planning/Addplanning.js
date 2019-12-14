@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import {Firebase, NotificationService} from '../../extensions/wizerCore';
+import {Firebase, NotificationService} from '../wizerCore';
 import AsyncStorage from '@react-native-community/async-storage';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
@@ -54,7 +54,7 @@ class Addplanning extends Component {
     const notifTimeFormat = hh + ':' + minmin;
     const notifDateFormat = dd + '/' + mm + '/' + yyyy;
     const notifDate = notifDateFormat + ' at ' + notifTimeFormat;
-    const currentUserId = await Firebase.getCurrentUserId();
+    const currentUserId = await AsyncStorage.getItem('currentUserId');
     const notifMessage = this.state.notifMessage;
     const notifKey = Math.floor(Math.random() * Math.floor(100000000));
     const sortDate = JSON.stringify(date);
@@ -105,16 +105,16 @@ class Addplanning extends Component {
             notificationDate,
             notificationKey,
           };
-          if (new Date().getTime() > checkDate.getTime() + 500) {
+          if (new Date().getTime() > checkDate.getTime()) {
             removeList.push(toAddItem);
           } else {
             dataList.push(toAddItem);
           }
         });
         removeList.forEach(async item => {
-          const pastItemMessage = item.notificationMessage;
+          const pastMessage = item.notificationMessage;
           const pastItemDate = item.notificationDate;
-          const pastItem = {pastItemMessage, pastItemDate};
+          const pastItem = {pastMessage, pastItemDate};
           await Firebase.addPastItem(currentUserId, pastItem);
           await Firebase.removePlanningItem(currentUserId, item.key);
         });
