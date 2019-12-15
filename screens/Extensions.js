@@ -14,6 +14,8 @@ import {
 // Import the extensions array
 import * as ExtensionList from '../extensions/extensionOverview';
 
+import {colors} from '../extensions/wizerCore';
+
 class Extensions extends Component {
   constructor(props) {
     super(props);
@@ -31,8 +33,8 @@ class Extensions extends Component {
         {this.state.extensionsList.map((item, i) => {
           const extensionIcon = new ExtensionList[item[0]]().extensionIcon();
           let name = item[0];
-          if (name.length > 13) {
-            name = name.substr(0, 10) + '...';
+          if (name.length > 11) {
+            name = name.substr(0, 9) + '...';
           }
           return (
             <TouchableOpacity
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   noExtensions: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 17,
     marginTop: 50,
     fontFamily:
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flex: 0,
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
   },
   hideStatusBar: {
     marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 15,
@@ -168,7 +170,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   extensionName: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 13,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
@@ -191,7 +193,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   goBackText: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 15,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
@@ -201,11 +203,11 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 25,
-    color: '#44234C',
+    color: colors.wizer,
   },
   goBack: {
     borderWidth: 1,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: 125,
     paddingVertical: 5,

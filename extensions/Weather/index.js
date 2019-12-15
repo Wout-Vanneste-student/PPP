@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 
-import {WEATHER_API_KEY} from '../wizerCore';
+import {WEATHER_API_KEY, colors} from '../wizerCore';
 
 import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
@@ -311,25 +311,25 @@ const styles = StyleSheet.create({
   },
   conditionText: {
     fontSize: 17,
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   tempText: {
     fontSize: 50,
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   locationText: {
     fontSize: 20,
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   todayWeatherText: {
     fontSize: 30,
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     marginBottom: 15,
@@ -337,13 +337,13 @@ const styles = StyleSheet.create({
   todayWeatherInfo: {
     fontSize: 20,
     marginBottom: 5,
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   loadingText: {
     fontSize: 25,
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',

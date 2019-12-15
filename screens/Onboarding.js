@@ -9,9 +9,10 @@ import {
   StyleSheet,
   Platform,
   StatusBar,
+  ActivityIndicator,
   View,
 } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+import {colors} from '../extensions/wizerCore';
 
 const slides = [
   {
@@ -20,14 +21,16 @@ const slides = [
     text: 'Keep track off everything on your planning',
     title_image: require('../assets/img/wizer_white.png'),
     image: require('../assets/img/todo.png'),
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
   },
 ];
 
 class Onboarding extends Component {
   constructor() {
     super();
-    this.state = {};
+    this.state = {
+      userLoading: false,
+    };
   }
   static navigationOptions = {
     header: null,
@@ -38,20 +41,13 @@ class Onboarding extends Component {
   }
 
   checkLoggedInUser = async () => {
-    const response = await firebase
-      .auth()
-      .onAuthStateChanged(async function(user) {
-        if (user) {
-          await AsyncStorage.setItem('currentUserId', user.uid);
-          return true;
-        } else {
-          return false;
-        }
-      });
-    if (response) {
-      const {navigate} = this.props.navigation;
-      navigate('Home');
-    }
+    await firebase.auth().onAuthStateChanged(async user => {
+      if (user) {
+        this.setState({userLoading: false});
+        const {navigate} = this.props.navigation;
+        navigate('Home');
+      }
+    });
   };
 
   _renderItem = ({item}) => {
@@ -73,19 +69,34 @@ class Onboarding extends Component {
   };
 
   render() {
+    const {userLoading} = this.state;
     return (
-      <SafeAreaView style={styles.onboarding}>
-        <AppIntroSlider
-          showSkipButton
-          showPrevButton
-          renderDoneButton={this._renderDoneButton}
-          renderItem={this._renderItem}
-          slides={slides}
-          onDone={this._onDone}
-          dotStyle={styles.dotstyle}
-          activeDotStyle={styles.activedotstyle}
-          style={styles.hideStatusBar}
-        />
+      <SafeAreaView
+        style={userLoading ? styles.loadingOnboarding : styles.onboarding}>
+        {userLoading ? (
+          <>
+            <Image
+              style={styles.title_image}
+              source={require('../assets/img/wizer_dark.png')}
+            />
+            <ActivityIndicator size="large" color={colors.wizer} />
+            <Text style={styles.bottom_text}>
+              Wizer is loading your profile {'\n'} just a moment please…
+            </Text>
+          </>
+        ) : (
+          <AppIntroSlider
+            showSkipButton
+            showPrevButton
+            renderDoneButton={this._renderDoneButton}
+            renderItem={this._renderItem}
+            slides={slides}
+            onDone={this._onDone}
+            dotStyle={styles.dotstyle}
+            activeDotStyle={styles.activedotstyle}
+            style={styles.hideStatusBar}
+          />
+        )}
       </SafeAreaView>
     );
   }
@@ -98,10 +109,17 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   onboarding: {
-    paddingTop: 25,
     paddingBottom: Platform.OS === 'android' ? 0 : 100,
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
     flex: 1,
+  },
+  loadingOnboarding: {
+    paddingTop: 25,
+    paddingBottom: 50,
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   onboardingView: {
     flex: 1,
@@ -139,6 +157,20 @@ const styles = StyleSheet.create({
   },
   rightButton: {
     marginRight: 15,
+  },
+  title_image: {
+    width: 250,
+    height: 150,
+    resizeMode: 'contain',
+    paddingTop: 200,
+  },
+  bottom_text: {
+    color: colors.wizer,
+    fontSize: 17.5,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+    textAlign: 'center',
+    paddingHorizontal: 10,
   },
 });
 

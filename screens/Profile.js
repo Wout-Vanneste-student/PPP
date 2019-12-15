@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import {Firebase} from '../extensions/wizerCore';
+import {Firebase, colors} from '../extensions/wizerCore';
 
 class Profile extends Component {
   constructor() {
@@ -37,12 +37,23 @@ class Profile extends Component {
     if (value) {
       this.setState({userName: value});
     } else {
-      const currentUserId = await AsyncStorage.getItem('currentUserId');
-      const currentUserName = await Firebase.getCurrentUserName(currentUserId);
+      this.currentUserId = await AsyncStorage.getItem('currentUserId');
+      if (this.currentUserId === null) {
+        this.currentUserId = await Firebase.getCurrentUserId();
+      }
+      if (this.currentUserId.charAt(0) === '"') {
+        this.currentUserId = this.currentUserId.substring(
+          1,
+          this.currentUserId.length - 1,
+        );
+      }
+      const currentUserName = await Firebase.getCurrentUserName(
+        this.currentUserId,
+      );
       const subThis = JSON.stringify(currentUserName);
       const userName = subThis.substring(1, subThis.length - 1);
+      this.setState({userName: userName});
       await AsyncStorage.setItem('userName', userName);
-      this.setState({userName: value});
     }
   };
 
@@ -50,7 +61,7 @@ class Profile extends Component {
     const {navigate} = this.props.navigation;
     Firebase.signOut()
       .then(AsyncStorage.clear())
-      .then(navigate('Startup'));
+      .then(navigate('Onboarding'));
   };
 
   render() {
@@ -98,11 +109,11 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flex: 0,
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
   },
   big_button: {
     borderWidth: 2,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: '100%',
     display: 'flex',
@@ -113,14 +124,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   button_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 20,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   headerText: {
     fontSize: 25,
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
@@ -130,7 +141,7 @@ const styles = StyleSheet.create({
 
   didYouKnow: {
     fontSize: 17,
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
@@ -142,7 +153,7 @@ const styles = StyleSheet.create({
     width: '85%',
     alignSelf: 'center',
     marginBottom: 15,
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
@@ -150,7 +161,7 @@ const styles = StyleSheet.create({
   thankDesignerButton: {
     marginBottom: 50,
     borderWidth: 1,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: '80%',
     display: 'flex',
@@ -161,7 +172,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   thankDesignerButtonText: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 17,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',

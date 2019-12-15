@@ -12,6 +12,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import {colors} from '../extensions/wizerCore';
 
 class Signup extends Component {
   constructor() {
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderBottomWidth: 2,
-    borderBottomColor: '#44234C',
+    borderBottomColor: colors.wizer,
     width: '100%',
     marginTop: 10,
     fontSize: 17.5,
@@ -384,7 +385,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 25,
   },
   title_image: {
@@ -395,7 +396,7 @@ const styles = StyleSheet.create({
   },
   big_button: {
     borderWidth: 2,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: '100%',
     display: 'flex',
@@ -409,7 +410,7 @@ const styles = StyleSheet.create({
     opacity: 0.2,
   },
   button_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 25,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',

@@ -14,7 +14,7 @@ import {
   Linking,
 } from 'react-native';
 
-import {Firebase, NotificationService} from '../wizerCore';
+import {Firebase, NotificationService, colors} from '../wizerCore';
 import AsyncStorage from '@react-native-community/async-storage';
 
 class Ticketmaster extends Component {
@@ -108,7 +108,7 @@ class Ticketmaster extends Component {
     const notifTimeFormat = hh + ':' + minmin;
     const notifDateFormat = dd + '/' + mm + '/' + yyyy;
     const notifDate = notifDateFormat + ' at ' + notifTimeFormat;
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
+    const currentUserId = await Firebase.getCurrentUserId();
     const notifKey = Math.floor(Math.random() * Math.floor(100000000));
     const sortDate = JSON.stringify(date);
     const planningData = {
@@ -141,7 +141,7 @@ class Ticketmaster extends Component {
               style={styles.scrollview}
               refreshControl={
                 <RefreshControl
-                  colors={['#44234C']}
+                  colors={[colors.wizer]}
                   tintColor="#44234C"
                   onRefresh={this.onRefresh}
                   refreshing={this.state.refreshing}
@@ -307,12 +307,12 @@ const PlannedConcerts = ({concerts, handleRemindConcert}) => {
 const styles = StyleSheet.create({
   topBar: {
     flex: 0,
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
   },
   itemsTitle: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-bold',
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontSize: 17.5,
     marginTop: Platform.OS === 'android' ? 0 : 15,
@@ -334,13 +334,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   concertItemBorder: {
-    borderBottomColor: '#44234C',
+    borderBottomColor: colors.wizer,
     borderBottomWidth: 1,
   },
   concertHelpText: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     marginTop: 30,
   },
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   concert: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 17,
     marginBottom: 5,
     fontFamily:
@@ -366,13 +366,13 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   venue: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 15,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-italic',
   },
   ticketinfo: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 15,
     marginTop: 10,
     marginBottom: 5,
@@ -380,14 +380,14 @@ const styles = StyleSheet.create({
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-bold',
   },
   ticketSale: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 15,
     paddingBottom: 10,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   concertDate: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 15,
     marginVertical: 10,
     fontFamily:
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
 
   loadingText: {
     fontSize: 25,
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
   },
   reminderButton: {
     borderWidth: 1,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: 215,
     display: 'flex',
@@ -427,13 +427,13 @@ const styles = StyleSheet.create({
   reminderButtonText: {
     fontSize: 15,
     alignSelf: 'center',
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   buyButton: {
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
     borderRadius: 5,
     width: 125,
     display: 'flex',

@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import {Firebase, NotificationService} from '../wizerCore';
+import {Firebase, NotificationService, colors} from '../wizerCore';
 import AsyncStorage from '@react-native-community/async-storage';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
@@ -34,6 +34,7 @@ class Addplanning extends Component {
   };
 
   scheduleNotif = async (date, message) => {
+    this.setState({canSubmit: false});
     let dd = date.getDate();
     let mm = date.getMonth() + 1;
     const yyyy = date.getFullYear();
@@ -54,7 +55,7 @@ class Addplanning extends Component {
     const notifTimeFormat = hh + ':' + minmin;
     const notifDateFormat = dd + '/' + mm + '/' + yyyy;
     const notifDate = notifDateFormat + ' at ' + notifTimeFormat;
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
+    const currentUserId = await Firebase.getCurrentUserId();
     const notifMessage = this.state.notifMessage;
     const notifKey = Math.floor(Math.random() * Math.floor(100000000));
     const sortDate = JSON.stringify(date);
@@ -134,7 +135,6 @@ class Addplanning extends Component {
     } else {
       this.setState({canSubmit: false});
     }
-    this.setState({canSubmit: true});
   };
 
   handleChangeText = notifMessage => {
@@ -153,6 +153,9 @@ class Addplanning extends Component {
   handleDatePicked = date => {
     this.setState({notifDate: date});
     this.hideDateTimePicker();
+    if (this.state.notifMessage !== '') {
+      this.setState({canSubmit: true});
+    }
   };
   render() {
     const {canSubmit, notifDate, minDate} = this.state;
@@ -274,7 +277,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 15,
   },
   notificationText: {
@@ -284,12 +287,12 @@ const styles = StyleSheet.create({
         : Platform.OS === 'android'
         ? 'Playfair-Display-italic'
         : 'Didot-Italic',
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 16,
     textAlign: 'center',
   },
   date_button: {
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
 
     borderRadius: 5,
     width: '100%',
@@ -309,7 +312,7 @@ const styles = StyleSheet.create({
   },
   big_button: {
     borderWidth: 2,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: '100%',
     display: 'flex',
@@ -321,7 +324,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   button_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 25,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
@@ -331,7 +334,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderBottomWidth: 2,
-    borderBottomColor: '#44234C',
+    borderBottomColor: colors.wizer,
     marginTop: 10,
     fontSize: 17.5,
     fontFamily:
@@ -341,14 +344,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-    color: '#44234C',
+    color: colors.wizer,
     marginBottom: 15,
   },
   formContainer: {
     marginTop: 15,
   },
   goBackText: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 15,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',

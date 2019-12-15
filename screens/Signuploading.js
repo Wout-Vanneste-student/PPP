@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import {Firebase} from '../extensions/wizerCore';
+import {Firebase, colors} from '../extensions/wizerCore';
 
 class Signuploading extends Component {
   constructor() {
@@ -56,6 +56,7 @@ class Signuploading extends Component {
           const {username, email} = this.state;
           let userData = {email, uid};
           const userId = response.user.uid;
+
           AsyncStorage.setItem('currentUserId', JSON.stringify(userId));
           AsyncStorage.setItem('userName', username);
           await Firebase.createNewUser(userData);
@@ -70,7 +71,7 @@ class Signuploading extends Component {
           AsyncStorage.removeItem('SIGNUP_username');
           AsyncStorage.removeItem('SIGNUP_email');
           AsyncStorage.removeItem('SIGNUP_password');
-          navigate('Extensions');
+          navigate('Home');
         }
       }
     }
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     paddingTop: 200,
   },
   bottom_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 17.5,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',

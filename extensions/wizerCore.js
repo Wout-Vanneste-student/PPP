@@ -7,27 +7,12 @@ import PushNotification from 'react-native-push-notification';
 firebase.initializeApp(firebaseConfig.firebase);
 
 export const Firebase = {
-  // loginWithGoogle: token => {
-  //   console.log('google token: ', token);
-  //   const credential = firebase.auth.GoogleAuthProvider.credential(token);
-  //   console.log('google credential: ', credential);
-  // },
   loginWithFacebook: token => {
     const credential = firebase.auth.FacebookAuthProvider.credential(token);
-    firebase
-      .auth()
-      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => {
-        return firebase.auth().signInWithCredential(credential);
-      });
+    return firebase.auth().signInWithCredential(credential);
   },
   loginWithEmail: (email, password) => {
-    firebase
-      .auth()
-      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => {
-        return firebase.auth().signInWithEmailAndPassword(email, password);
-      });
+    return firebase.auth().signInWithEmailAndPassword(email, password);
   },
   signupWithEmail: (email, password) => {
     return firebase.auth().createUserWithEmailAndPassword(email, password);
@@ -161,6 +146,8 @@ export const NotificationService = class NotifService {
       message: notifMessage,
       date: notifTime,
       userInfo: {id: notifNumber},
+      importance: 'max',
+      priority: 'max',
     });
   }
   checkPermission(cbk) {
@@ -174,3 +161,7 @@ export const NotificationService = class NotifService {
 };
 
 export const WEATHER_API_KEY = 'b108b94a6a4f689e72be20fa2728123d';
+
+export const colors = {
+  wizer: '#44234C',
+};

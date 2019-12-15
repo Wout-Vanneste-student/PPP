@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import {Firebase} from '../extensions/wizerCore';
+import {Firebase, colors} from '../extensions/wizerCore';
 
 class Loadprofile extends Component {
   constructor() {
@@ -33,15 +33,20 @@ class Loadprofile extends Component {
     if (fbUser) {
       await Firebase.loginWithFacebook(fbUser);
       this.currentUserId = await AsyncStorage.getItem('currentUserId');
+      if (this.currentUserId === null) {
+        this.currentUserId = await Firebase.getCurrentUserId();
+      }
       this.setState({userFound: true});
       this.loadUserdata();
     }
     try {
-      const value = await AsyncStorage.getItem('currentUserId');
-      if (value !== null) {
-        var currentId = value.substring(1, value.length - 1);
+      if (this.currentUserId !== null) {
+        var currentId = this.currentUserId.substring(
+          1,
+          this.currentUserId.length - 1,
+        );
         this.currentUserId = currentId;
-        const currentUser = await Firebase.getCurrentUserWithId(currentId);
+        const currentUser = await Firebase.getCurrentUser();
         let email, password, currentData;
         currentUser.forEach(data => {
           switch (data.key) {
@@ -129,6 +134,11 @@ class Loadprofile extends Component {
       pastList.push(toAddPastItem);
     });
     const currentUserId = await AsyncStorage.getItem('currentUserId');
+    const currentUserIdloaddata = await Firebase.getCurrentUserId();
+    console.log(
+      'currentuserid in loaduserdata in loadprofile: ',
+      currentUserIdloaddata,
+    );
     removeList.forEach(async item => {
       const pastMessage = item.notificationMessage;
       const pastItemDate = item.notificationDate;
@@ -179,7 +189,7 @@ const styles = StyleSheet.create({
     paddingTop: 200,
   },
   bottom_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 17.5,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',

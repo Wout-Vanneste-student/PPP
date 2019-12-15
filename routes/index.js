@@ -14,6 +14,8 @@ import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
 
+import {colors} from '../extensions/wizerCore';
+
 const TabNavigator = createBottomTabNavigator(
   {
     Home: {
@@ -69,7 +71,7 @@ const TabNavigator = createBottomTabNavigator(
     tabBarOptions: {
       showIcon: true,
       showLabel: false,
-      activeBackgroundColor: '#44234C',
+      activeBackgroundColor: colors.wizer,
       labelStyle: {
         fontSize: 14,
         padding: 3,
@@ -82,10 +84,10 @@ const TabNavigator = createBottomTabNavigator(
         borderTopWidth: 2,
         borderLeftWidth: 1,
         borderRightWidth: 1,
-        borderTopColor: '#44234C',
-        borderLeftColor: '#44234C',
-        borderRightColor: '#44234C',
-        backgroundColor: '#44234C',
+        borderTopColor: colors.wizer,
+        borderLeftColor: colors.wizer,
+        borderRightColor: colors.wizer,
+        backgroundColor: colors.wizer,
       },
     },
   },

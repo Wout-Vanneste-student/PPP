@@ -8,13 +8,13 @@ import {
   Image,
   View,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
-import {Firebase} from '../extensions/wizerCore';
+import {Firebase, colors} from '../extensions/wizerCore';
 
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
-// import {GoogleSignin} from '@react-native-community/google-signin';
 
 class Startup extends Component {
   constructor(props) {
@@ -24,29 +24,15 @@ class Startup extends Component {
       password: '',
       showLoading: false,
       userFound: false,
+      isLoading: false,
     };
   }
   static navigationOptions = {
     header: null,
   };
 
-  componentDidMount() {
-    // this.getLoggenInUser();
-  }
-
-  getLoggenInUser = async () => {
-    const storedToken = await AsyncStorage.getItem('facebookToken');
-    if (storedToken) {
-      const {navigate} = this.props.navigation;
-      navigate('Loadprofile');
-    }
-    const value = await AsyncStorage.getItem('currentUserId');
-    if (value !== null) {
-      const {navigate} = this.props.navigation;
-      navigate('Loadprofile');
-    }
-  };
   handleLoginWithFacebook = async () => {
+    this.setState({isLoading: true});
     let canLogin = false;
     await LoginManager.logInWithPermissions(['email', 'public_profile'])
       .then(
@@ -64,6 +50,7 @@ class Startup extends Component {
                   const uid = fbResult.user.uid;
                   const username = displayname[0];
                   await AsyncStorage.setItem('userName', username);
+                  await AsyncStorage.setItem('currentUserId', uid);
                   let userData = {email, uid};
                   await Firebase.createNewUser(userData);
                   userData = {username, email, uid};
@@ -76,88 +63,81 @@ class Startup extends Component {
             });
           }
         },
-        function(error) {
+        async function(error) {
           console.log('Login fail with error: ' + error);
         },
       )
       .then(() => {
         if (canLogin) {
           const {navigate} = this.props.navigation;
-          navigate('Loadprofile');
+          navigate('Home');
         }
       });
   };
 
-  handleLoginWithGoogle = async () => {
-    console.log('google');
-    // Google login not yet working
-    // GoogleSignin.configure({
-    //   webClientId:
-    //     '233359428361-0cmb49b5u902pupo91kcmfri8g23u3a4.apps.googleusercontent.com',
-    //   iosClientId:
-    //     '233359428361-r23p31il8a2dbqhja6o8jilo3nnd5l0o.apps.googleusercontent.com',
-    // });
-    // GoogleSignin.signIn()
-    //   .then(result => {
-    //     console.log('result: ', result);
-    //   })
-    //   .catch(error => {
-    //     console.log('error: ', error);
-    //   });
-  };
-
   render() {
     const {navigate} = this.props.navigation;
+    const {isLoading} = this.state;
     return (
       <SafeAreaView style={styles.hideStatusBar}>
-        <Image
-          style={styles.title_image}
-          source={require('../assets/img/wizer_dark.png')}
-        />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.big_button, styles.login_button, styles.top_button]}
-            onPress={() => navigate('Login')}>
+        {isLoading ? (
+          <>
             <Image
-              style={styles.email_icon}
-              source={require('../assets/img/email.png')}
+              style={styles.title_image}
+              source={require('../assets/img/wizer_dark.png')}
             />
-            <Text style={styles.button_text}>Login with email</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.facebook_button,
-              styles.big_button,
-              styles.top_button,
-            ]}
-            onPress={() => this.handleLoginWithFacebook()}>
+            <ActivityIndicator size="large" color={colors.wizer} />
+            <Text style={styles.bottom_text}>
+              Wizer is creating your profile {'\n'} just a moment please…
+            </Text>
+          </>
+        ) : (
+          <>
             <Image
-              style={styles.button_icon}
-              source={require('../assets/img/facebook.png')}
+              style={styles.title_image}
+              source={require('../assets/img/wizer_dark.png')}
             />
-            <Text style={styles.fbgoogle_button_text}>Login with Facebook</Text>
-          </TouchableOpacity>
-          {/*
-          Google login not yet working
-          <TouchableOpacity
-            style={[styles.google_button, styles.big_button, styles.top_button]}
-            onPress={() => this.handleLoginWithGoogle()}>
-            <Image
-              style={styles.button_icon}
-              source={require('../assets/img/google.png')}
-            />
-            <Text style={styles.fbgoogle_button_text}>Login with Google</Text>
-          </TouchableOpacity> */}
-          <Text style={styles.noAccount}>No account yet?</Text>
-          <TouchableOpacity
-            style={styles.signup_button}
-            onPress={() => navigate('Signup')}>
-            <Text style={styles.signup_button_text}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.bottom_text}>
-          Join Wizer and make your planning easier and wiser than ever.
-        </Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.big_button,
+                  styles.login_button,
+                  styles.top_button,
+                ]}
+                onPress={() => navigate('Login')}>
+                <Image
+                  style={styles.email_icon}
+                  source={require('../assets/img/email.png')}
+                />
+                <Text style={styles.button_text}>Login with email</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.facebook_button,
+                  styles.big_button,
+                  styles.top_button,
+                ]}
+                onPress={() => this.handleLoginWithFacebook()}>
+                <Image
+                  style={styles.button_icon}
+                  source={require('../assets/img/facebook.png')}
+                />
+                <Text style={styles.fbgoogle_button_text}>
+                  Login with Facebook
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.noAccount}>No account yet?</Text>
+              <TouchableOpacity
+                style={styles.signup_button}
+                onPress={() => navigate('Signup')}>
+                <Text style={styles.signup_button_text}>Sign up</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.bottom_text}>
+              Join Wizer and make your planning easier and wiser than ever.
+            </Text>
+          </>
+        )}
       </SafeAreaView>
     );
   }
@@ -167,7 +147,7 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     textAlign: 'center',
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 17,
     marginBottom: 10,
     marginTop: 20,
@@ -192,7 +172,7 @@ const styles = StyleSheet.create({
     paddingTop: 200,
   },
   bottom_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 17.5,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
@@ -204,7 +184,7 @@ const styles = StyleSheet.create({
   },
   signup_button: {
     borderWidth: 2,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     alignSelf: 'center',
     width: '50%',
@@ -215,13 +195,13 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'android' ? 9 : 4,
   },
   signup_button_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 20,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   login_button: {
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
   },
   big_button: {
     borderRadius: 5,

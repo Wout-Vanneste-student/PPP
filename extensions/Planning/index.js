@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Firebase, NotificationService} from '../wizerCore';
+import {Firebase, NotificationService, colors} from '../wizerCore';
 import Addplanning from './Addplanning';
 
 class PlanningClass extends Component {
@@ -56,7 +56,7 @@ class PlanningClass extends Component {
   };
 
   reloadPlanning = async () => {
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
+    const currentUserId = await Firebase.getCurrentUserId();
     const dataList = [];
     const data = await Firebase.getPlanningUser(currentUserId);
     let removeList = [];
@@ -108,7 +108,11 @@ class PlanningClass extends Component {
 
   handleRemovePlanningItem = async item => {
     this.cancelNotif(item.notificationKey);
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
+    const currentUserId = await Firebase.getCurrentUserId();
+    console.log(
+      'currentuserid in handleremoveplanningitem planning: ',
+      currentUserId,
+    );
     await Firebase.removePlanningItem(currentUserId, item.key);
     this.reloadPlanning();
   };
@@ -119,7 +123,11 @@ class PlanningClass extends Component {
 
   reloadPastPlanning = async () => {
     const pastList = [];
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
+    const currentUserId = await Firebase.getCurrentUserId();
+    console.log(
+      'currentuserid in reloadpastplanning planning: ',
+      currentUserId,
+    );
     const pastData = await Firebase.getPastPlanningUser(currentUserId);
     pastData.forEach(pastItem => {
       const pastKey = pastItem.key;
@@ -162,7 +170,7 @@ class PlanningClass extends Component {
               <RefreshControl
                 onRefresh={this.onRefresh}
                 refreshing={this.state.refreshing}
-                colors={['#44234C']}
+                colors={[colors.wizer]}
                 tintColor="#44234C"
               />
             }>
@@ -261,14 +269,14 @@ const styles = StyleSheet.create({
   planningHelp: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     marginTop: 30,
   },
   customfont: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-    color: '#44234C',
+    color: colors.wizer,
   },
   planningHeader: {
     marginTop: 5,
@@ -277,14 +285,14 @@ const styles = StyleSheet.create({
   planningHeaderText: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-bold',
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 20,
   },
   headerText: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 25,
-    color: '#44234C',
+    color: colors.wizer,
   },
   brandingImage: {
     width: 90,
@@ -299,7 +307,7 @@ const styles = StyleSheet.create({
   },
   big_button: {
     borderWidth: 2,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: '100%',
     display: 'flex',
@@ -314,13 +322,13 @@ const styles = StyleSheet.create({
     opacity: 0.2,
   },
   button_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 20,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
   },
   planningItemBorder: {
-    borderBottomColor: '#44234C',
+    borderBottomColor: colors.wizer,
     borderBottomWidth: 1,
   },
   planningItem: {
@@ -331,12 +339,12 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   planningDate: {
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
   },
   planningText: {
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 17.5,

@@ -12,6 +12,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
+import {colors} from '../wizerCore';
+
 class News extends Component {
   constructor() {
     super();
@@ -95,7 +97,7 @@ class News extends Component {
               <RefreshControl
                 onRefresh={this.onRefresh}
                 refreshing={this.state.refreshing}
-                colors={['#44234C']}
+                colors={[colors.wizer]}
                 tintColor="#44234C"
               />
             }>
@@ -185,7 +187,7 @@ const styles = StyleSheet.create({
     height: '50%',
   },
   newsHeader: {
-    color: '#44234C',
+    color: colors.wizer,
     marginVertical: 10,
     fontSize: 20,
     fontFamily:
@@ -196,7 +198,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 25,
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
   },
   newsItemBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: '#44234C',
+    borderBottomColor: colors.wizer,
   },
   itemImg: {
     height: 150,
@@ -224,18 +226,18 @@ const styles = StyleSheet.create({
   },
   itemImgText: {
     fontSize: 15,
-    color: '#44234C',
+    color: colors.wizer,
     marginVertical: 5,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-italic',
   },
   itemText: {
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
   },
   itemTitle: {
-    color: '#44234C',
+    color: colors.wizer,
     marginTop: 5,
     marginBottom: 10,
     fontFamily:
@@ -244,7 +246,7 @@ const styles = StyleSheet.create({
   },
   itemButton: {
     borderWidth: 1,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: 150,
     display: 'flex',
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
   itemButtonText: {
     fontSize: 15,
     alignSelf: 'center',
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',

@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {Firebase} from '../extensions/wizerCore';
+import {Firebase, colors} from '../extensions/wizerCore';
 
 class Home extends Component {
   constructor() {
@@ -32,6 +32,9 @@ class Home extends Component {
     let pastData = await AsyncStorage.getItem('pastPlanning');
     if (pastData !== null) {
       this.setState({pastItems: JSON.parse(pastData)});
+    } else {
+      const currentUserId = await Firebase.getCurrentUserId();
+      pastData = await Firebase.getPlanningUser(currentUserId);
     }
   };
 
@@ -42,8 +45,7 @@ class Home extends Component {
 
   reloadPastPlanning = async () => {
     const pastList = [];
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
-
+    const currentUserId = await Firebase.getCurrentUserId();
     const dataList = [];
     const data = await Firebase.getPlanningUser(currentUserId);
     let removeList = [];
@@ -105,14 +107,14 @@ class Home extends Component {
   };
 
   handleRemoveItem = async item => {
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
+    const currentUserId = await Firebase.getCurrentUserId();
     await Firebase.removePastItem(currentUserId, item.pastKey);
     await this.reloadPastPlanning();
     this.getPastPlanning();
   };
 
   handleRemoveAllItems = async () => {
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
+    const currentUserId = await Firebase.getCurrentUserId();
     await Firebase.removeAllPastItems(currentUserId);
     await this.reloadPastPlanning();
     this.getPastPlanning();
@@ -129,7 +131,7 @@ class Home extends Component {
               contentContainerStyle={styles.scrollview}
               refreshControl={
                 <RefreshControl
-                  colors={['#44234C']}
+                  colors={[colors.wizer]}
                   tintColor="#44234C"
                   onRefresh={this.onRefresh}
                   refreshing={this.state.refreshing}
@@ -208,7 +210,7 @@ const PastPlanning = ({data, handleRemoveItem}) => {
 const styles = StyleSheet.create({
   topBar: {
     flex: 0,
-    backgroundColor: '#44234C',
+    backgroundColor: colors.wizer,
   },
   homeFlex: {
     flex: 1,
@@ -219,7 +221,7 @@ const styles = StyleSheet.create({
   itemsTitle: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-bold',
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     fontSize: 17.5,
     marginTop: Platform.OS === 'android' ? 0 : 15,
@@ -240,7 +242,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   planningItemBorder: {
-    borderBottomColor: '#44234C',
+    borderBottomColor: colors.wizer,
     borderBottomWidth: 1,
   },
   planningItem: {
@@ -250,19 +252,19 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   planningDate: {
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
   },
   planningHelp: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-italic' : 'Didot-Italic',
-    color: '#44234C',
+    color: colors.wizer,
     textAlign: 'center',
     marginTop: 30,
   },
   planningText: {
-    color: '#44234C',
+    color: colors.wizer,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 17.5,
@@ -295,7 +297,7 @@ const styles = StyleSheet.create({
   },
   big_button: {
     borderWidth: 2,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: '100%',
     display: 'flex',
@@ -307,7 +309,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   buttonText: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 20,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',

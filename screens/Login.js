@@ -9,10 +9,11 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import firebase from '../config/Firebase';
+import {Firebase, colors} from '../extensions/wizerCore';
 
 class Login extends Component {
   constructor() {
@@ -28,6 +29,7 @@ class Login extends Component {
       isEmailError: true,
       isPasswordError: true,
       hidePassword: true,
+      isLoading: false,
     };
   }
 
@@ -42,19 +44,18 @@ class Login extends Component {
   retrieveData = async () => {};
 
   handleLogin = async () => {
+    this.setState({isLoading: true});
     const {email, password} = this.state;
     try {
-      const response = await firebase.loginWithEmail(email, password);
-      if (response.user.uid) {
+      await Firebase.loginWithEmail(email, password);
+      const user = await Firebase.getCurrentUser();
+      if (user.uid) {
         this.setState({userFound: true});
+        const userId = user.uid;
+        console.log('useridlogin:', userId);
+        AsyncStorage.setItem('currentUserId', JSON.stringify(userId));
       }
-      const userId = response.user.uid;
-      AsyncStorage.setItem('currentUserId', JSON.stringify(userId));
     } catch (error) {
-      /*
-      Currently the error message gets shown to the user
-      maybe I will change this to custom messages in the future
-      */
       console.log(error);
       this.setState({
         loginError: 'No user found, your email or password was incorrect.',
@@ -63,7 +64,7 @@ class Login extends Component {
     } finally {
       if (this.state.userFound === true) {
         const {navigate} = this.props.navigation;
-        navigate('Loadprofile');
+        navigate('Home');
       }
     }
   };
@@ -119,75 +120,93 @@ class Login extends Component {
   };
 
   render() {
+    const {isLoading} = this.state;
     return (
       <SafeAreaView style={styles.hideStatusBar}>
-        <View style={styles.form}>
-          <Image
-            style={styles.title_image}
-            source={require('../assets/img/wizer_dark.png')}
-          />
-          <View style={styles.testen}>
-            <Text style={styles.inputLabel}>Email</Text>
-            <TextInput
-              style={styles.textInput}
-              onEndEditing={() => this.handleCheckEmail()}
-              keyboardType="email-address"
-              autoCorrect={false}
-              autoCapitalize="none"
-              value={this.state.email}
-              onChangeText={email =>
-                this.setState({email, emailError: '', loginError: ''})
-              }
+        {isLoading ? (
+          <>
+            <Image
+              style={styles.loading_title_image}
+              source={require('../assets/img/wizer_dark.png')}
             />
-            <Text style={styles.inputHelp}>Example: john@company.com</Text>
-            <Text style={styles.inputError}>{this.state.emailError}</Text>
-          </View>
-          <View style={styles.testen}>
-            <Text style={styles.inputLabel}>Password</Text>
-            <TextInput
-              style={styles.textInput}
-              onEndEditing={() => this.handleCheckPassword()}
-              secureTextEntry={this.state.hidePassword}
-              autoCorrect={false}
-              autoCapitalize="none"
-              value={this.state.password}
-              onChangeText={password =>
-                this.setState({password, passwordError: '', loginError: ''})
-              }
-            />
-            <TouchableOpacity
-              style={styles.hideShowPassword}
-              onPress={() =>
-                this.setState({hidePassword: !this.state.hidePassword})
-              }>
-              <Image
-                source={
-                  this.state.hidePassword
-                    ? require('../assets/img/hide.png')
-                    : require('../assets/img/show.png')
-                }
-                style={styles.hideShowPasswordImg}
-              />
-            </TouchableOpacity>
-            <Text style={styles.inputHelp}>
-              6+ character, capitals and numbers required
+            <ActivityIndicator size="large" color={colors.wizer} />
+            <Text style={styles.bottom_text}>
+              Wizer is loading your profile {'\n'} just a moment please…
             </Text>
-            <Text style={styles.inputError}>{this.state.passwordError}</Text>
-          </View>
-          <Text style={styles.inputError}>{this.state.loginError}</Text>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={
-              this.state.canSubmit
-                ? styles.big_button
-                : {...styles.big_button, ...styles.buttonDisabled}
-            }
-            onPress={() => this.handleLogin()}
-            disabled={this.state.canSubmit ? false : true}>
-            <Text style={styles.button_text}>Login</Text>
-          </TouchableOpacity>
-        </View>
+          </>
+        ) : (
+          <>
+            <View style={styles.form}>
+              <Image
+                style={styles.title_image}
+                source={require('../assets/img/wizer_dark.png')}
+              />
+              <View style={styles.testen}>
+                <Text style={styles.inputLabel}>Email</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onEndEditing={() => this.handleCheckEmail()}
+                  keyboardType="email-address"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={this.state.email}
+                  onChangeText={email =>
+                    this.setState({email, emailError: '', loginError: ''})
+                  }
+                />
+                <Text style={styles.inputHelp}>Example: john@company.com</Text>
+                <Text style={styles.inputError}>{this.state.emailError}</Text>
+              </View>
+              <View style={styles.testen}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onEndEditing={() => this.handleCheckPassword()}
+                  secureTextEntry={this.state.hidePassword}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={this.state.password}
+                  onChangeText={password =>
+                    this.setState({password, passwordError: '', loginError: ''})
+                  }
+                />
+                <TouchableOpacity
+                  style={styles.hideShowPassword}
+                  onPress={() =>
+                    this.setState({hidePassword: !this.state.hidePassword})
+                  }>
+                  <Image
+                    source={
+                      this.state.hidePassword
+                        ? require('../assets/img/hide.png')
+                        : require('../assets/img/show.png')
+                    }
+                    style={styles.hideShowPasswordImg}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.inputHelp}>
+                  6+ character, capitals and numbers required
+                </Text>
+                <Text style={styles.inputError}>
+                  {this.state.passwordError}
+                </Text>
+              </View>
+              <Text style={styles.inputError}>{this.state.loginError}</Text>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={
+                  this.state.canSubmit
+                    ? styles.big_button
+                    : {...styles.big_button, ...styles.buttonDisabled}
+                }
+                onPress={() => this.handleLogin()}
+                disabled={this.state.canSubmit ? false : true}>
+                <Text style={styles.button_text}>Login</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       </SafeAreaView>
     );
   }
@@ -214,7 +233,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderBottomWidth: 2,
-    borderBottomColor: '#44234C',
+    borderBottomColor: colors.wizer,
     marginTop: 10,
     fontSize: 17.5,
     fontFamily:
@@ -229,7 +248,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 25,
   },
   title_image: {
@@ -238,9 +257,15 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     paddingTop: 100,
   },
+  loading_title_image: {
+    width: 250,
+    height: 150,
+    resizeMode: 'contain',
+    paddingTop: 200,
+  },
   big_button: {
     borderWidth: 2,
-    borderColor: '#44234C',
+    borderColor: colors.wizer,
     borderRadius: 5,
     width: '100%',
     display: 'flex',
@@ -257,7 +282,7 @@ const styles = StyleSheet.create({
     opacity: 0.2,
   },
   button_text: {
-    color: '#44234C',
+    color: colors.wizer,
     fontSize: 25,
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-Bold',
@@ -287,6 +312,14 @@ const styles = StyleSheet.create({
   },
   canSubmit: {
     opacity: 1,
+  },
+  bottom_text: {
+    color: colors.wizer,
+    fontSize: 17.5,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
+    textAlign: 'center',
+    paddingHorizontal: 10,
   },
 });
 
