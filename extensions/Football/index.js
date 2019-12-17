@@ -10,8 +10,10 @@ import {
   ScrollView,
   RefreshControl,
 } from 'react-native';
+
 import {showMessage} from 'react-native-flash-message';
 import {Firebase, NotificationService, colors, generateKey} from '../wizerCore';
+
 const FOOTBALL_API_KEY = '37bdabc497bc42b39a26396352b9211a';
 
 class FootballClass extends Component {

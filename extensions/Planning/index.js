@@ -44,15 +44,17 @@ class PlanningClass extends Component {
   };
 
   componentDidMount() {
-    this.retrieveData();
-  }
-
-  componentDidUpdate() {
     this._reloadUserPlanning();
   }
 
+  componentDidUpdate() {
+    // this._reloadUserPlanning();
+  }
+
   _reloadUserPlanning = async () => {
-    await this.getPlanning();
+    // this.setState({userPlanning: []});
+    await this.reloadPlanning();
+    // await this.getPlanning();
   };
 
   reloadPlanning = async () => {

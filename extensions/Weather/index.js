@@ -69,6 +69,7 @@ class WeatherClass extends Component {
         `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}&units=metric`,
       );
       let weatherJson = await weather.json();
+      console.log('stop loading');
       this.setState({
         temperature: weatherJson.main.temp,
         weatherCondition: weatherJson.weather[0].main,
@@ -101,11 +102,32 @@ class WeatherClass extends Component {
               break;
             case RESULTS.GRANTED:
               status = 'GRANTED';
+
               break;
             case RESULTS.BLOCKED:
               status = 'BLOCKED';
               break;
           }
+        })
+        .then(() => {
+          console.log('then get position');
+          console.log('status in then: ', status);
+
+          Geolocation.getCurrentPosition(
+            position => {
+              if (position) {
+                this.setState({
+                  lat: position.coords.latitude,
+                  long: position.coords.longitude,
+                });
+              }
+              this.fetchWeather(this.state.lat, this.state.long);
+            },
+            error => {
+              console.log('error geolocation: ', error.code, error.message);
+            },
+            {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+          );
         })
         .catch(error => {
           console.log('permission error: ', error);
@@ -132,31 +154,32 @@ class WeatherClass extends Component {
               break;
           }
         })
+        .then(() => {
+          console.log('then get position');
+          console.log('status in then: ', status);
+
+          Geolocation.getCurrentPosition(
+            position => {
+              if (position) {
+                this.setState({
+                  lat: position.coords.latitude,
+                  long: position.coords.longitude,
+                });
+              }
+              this.fetchWeather(this.state.lat, this.state.long);
+            },
+            error => {
+              console.log('error geolocation: ', error.code, error.message);
+            },
+            {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+          );
+        })
         .catch(error => {
           console.log('permission error: ', error);
           this.setState({
             weatherError: "We don't have permission to your location",
           });
         });
-    }
-
-    if (status === 'GRANTED') {
-      console.log('granted');
-      Geolocation.getCurrentPosition(
-        position => {
-          if (position) {
-            this.setState({
-              lat: position.coords.latitude,
-              long: position.coords.longitude,
-            });
-          }
-          this.fetchWeather(this.state.lat, this.state.long);
-        },
-        error => {
-          console.log('error geolocation: ', error.code, error.message);
-        },
-        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-      );
     }
   };
 
