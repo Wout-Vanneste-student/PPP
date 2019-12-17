@@ -127,46 +127,50 @@ class Home extends Component {
         <SafeAreaView style={styles.hideStatusBar}>
           <StatusBar barStyle="light-content" />
           <View style={styles.planningWrapper}>
-            <ScrollView
-              contentContainerStyle={styles.scrollview}
-              refreshControl={
-                <RefreshControl
-                  colors={[colors.wizer]}
-                  tintColor="#44234C"
-                  onRefresh={this.onRefresh}
-                  refreshing={this.state.refreshing}
-                />
-              }>
-              {this.state.pastItems.length === 0 ? (
-                <View style={styles.imageView}>
-                  <Image
-                    source={require('../assets/img/cosy.png')}
-                    style={styles.freeImg}
+            <View style={styles.scrollview}>
+              <ScrollView
+                // contentContainerStyle={styles.scrollview}
+                refreshControl={
+                  <RefreshControl
+                    colors={[colors.wizer]}
+                    tintColor="#44234C"
+                    onRefresh={this.onRefresh}
+                    refreshing={this.state.refreshing}
                   />
-                  <Text style={styles.planningHelp}>
-                    Chill, you've done everything you needed to do
-                  </Text>
-                </View>
-              ) : (
-                <View style={styles.homeFlex}>
-                  <View>
-                    <Text style={styles.itemsTitle}>
-                      Here are your past reminders. {'\n'} Ready to get rid of
-                      them forever?
-                    </Text>
-                    <PastPlanning
-                      data={this.state.pastItems}
-                      handleRemoveItem={this.handleRemoveItem}
+                }>
+                {this.state.pastItems.length === 0 ? (
+                  <View style={styles.imageView}>
+                    <Image
+                      source={require('../assets/img/cosy.png')}
+                      style={styles.freeImg}
                     />
+                    <Text style={styles.planningHelp}>
+                      Chill, you've done everything you needed to do
+                    </Text>
                   </View>
-                  <TouchableOpacity
-                    onPress={this.handleRemoveAllItems}
-                    style={styles.big_button}>
-                    <Text style={styles.buttonText}>Remove all items</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </ScrollView>
+                ) : (
+                  <View style={styles.homeFlex}>
+                    <View>
+                      <Text style={styles.itemsTitle}>
+                        Here are your past reminders. {'\n'} Ready to get rid of
+                        them forever?
+                      </Text>
+                      <PastPlanning
+                        data={this.state.pastItems}
+                        handleRemoveItem={this.handleRemoveItem}
+                      />
+                    </View>
+                  </View>
+                )}
+              </ScrollView>
+            </View>
+            {this.state.pastItems.length === 0 ? null : (
+              <TouchableOpacity
+                onPress={this.handleRemoveAllItems}
+                style={styles.big_button}>
+                <Text style={styles.buttonText}>Remove all items</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </SafeAreaView>
       </>
@@ -234,7 +238,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   flexshrink: {flexShrink: 1},
-  scrollview: {height: '100%', flex: 1},
+  scrollview: {paddingBottom: 25, flex: 1},
   planningWrapper: {
     display: 'flex',
     height: '100%',

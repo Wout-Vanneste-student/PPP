@@ -160,7 +160,7 @@ export const NotificationService = class NotifService {
   }
 };
 
-export const WEATHER_API_KEY = 'b108b94a6a4f689e72be20fa2728123d';
+export const generateKey = Math.floor(Math.random() * Math.floor(100000000));
 
 export const colors = {
   wizer: '#44234C',

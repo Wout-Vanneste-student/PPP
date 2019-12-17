@@ -4,16 +4,16 @@ import {
   View,
   StyleSheet,
   Platform,
-  StatusBar,
   ActivityIndicator,
   Image,
 } from 'react-native';
 
-import {WEATHER_API_KEY, colors} from '../wizerCore';
+import {colors} from '../wizerCore';
 
 import Geolocation from 'react-native-geolocation-service';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
+const WEATHER_API_KEY = 'b108b94a6a4f689e72be20fa2728123d';
 const weatherIcons = {
   day01: require('./assets/01d.png'),
   day02: require('./assets/02d.png'),
@@ -48,6 +48,7 @@ class WeatherClass extends Component {
       humidity: null,
       lat: null,
       long: null,
+      weatherError: null,
     };
   }
 
@@ -62,23 +63,27 @@ class WeatherClass extends Component {
     this.retrieveData();
   }
 
-  fetchWeather = (lat = 50.9, lon = 3.3) => {
-    fetch(
-      `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}&units=metric`,
-    )
-      .then(res => res.json())
-      .then(json => {
-        this.setState({
-          temperature: json.main.temp,
-          weatherCondition: json.weather[0].main,
-          icon: json.weather[0].icon,
-          city: json.name,
-          minTemp: json.main.temp_min,
-          maxTemp: json.main.temp_max,
-          isLoading: false,
-          humidity: json.main.humidity,
-        });
+  fetchWeather = async (lat = 50.9, lon = 3.3) => {
+    try {
+      let weather = await fetch(
+        `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&APPID=${WEATHER_API_KEY}&units=metric`,
+      );
+      let weatherJson = await weather.json();
+      this.setState({
+        temperature: weatherJson.main.temp,
+        weatherCondition: weatherJson.weather[0].main,
+        icon: weatherJson.weather[0].icon,
+        city: weatherJson.name,
+        minTemp: weatherJson.main.temp_min,
+        maxTemp: weatherJson.main.temp_max,
+        isLoading: false,
+        humidity: weatherJson.main.humidity,
+        weatherError: null,
       });
+    } catch (error) {
+      console.log('weather error', error);
+      this.setState({weatherError: 'Something went wrong.'});
+    }
   };
 
   retrieveData = async () => {
@@ -104,6 +109,9 @@ class WeatherClass extends Component {
         })
         .catch(error => {
           console.log('permission error: ', error);
+          this.setState({
+            weatherError: "We don't have permission to your location",
+          });
         });
     } else {
       await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
@@ -126,16 +134,22 @@ class WeatherClass extends Component {
         })
         .catch(error => {
           console.log('permission error: ', error);
+          this.setState({
+            weatherError: "We don't have permission to your location",
+          });
         });
     }
 
     if (status === 'GRANTED') {
+      console.log('granted');
       Geolocation.getCurrentPosition(
         position => {
-          this.setState({
-            lat: position.coords.latitude,
-            long: position.coords.longitude,
-          });
+          if (position) {
+            this.setState({
+              lat: position.coords.latitude,
+              long: position.coords.longitude,
+            });
+          }
           this.fetchWeather(this.state.lat, this.state.long);
         },
         error => {
@@ -156,23 +170,30 @@ class WeatherClass extends Component {
       temperature,
       city,
       humidity,
+      weatherError,
     } = this.state;
-    return isLoading === true ? (
-      <View style={styles.hideStatusBar}>
-        <Text style={styles.loadingText}>Weather is loading</Text>
-        <ActivityIndicator size="large" color="#44234C" />
-      </View>
+    return weatherError === null ? (
+      isLoading === true ? (
+        <View style={styles.hideStatusBar}>
+          <Text style={styles.loadingText}>Weather is loading</Text>
+          <ActivityIndicator size="large" color="#44234C" />
+        </View>
+      ) : (
+        <View style={styles.hideStatusBar}>
+          <WeatherItem
+            condition={weatherCondition}
+            city={city}
+            icon={icon}
+            temperature={temperature}
+            minTemp={minTemp}
+            maxTemp={maxTemp}
+            humidity={humidity}
+          />
+        </View>
+      )
     ) : (
       <View style={styles.hideStatusBar}>
-        <WeatherItem
-          condition={weatherCondition}
-          city={city}
-          icon={icon}
-          temperature={temperature}
-          minTemp={minTemp}
-          maxTemp={maxTemp}
-          humidity={humidity}
-        />
+        <Text style={styles.loadingText}>{weatherError}</Text>
       </View>
     );
   }
@@ -281,7 +302,6 @@ const WeatherItem = ({
 
 const styles = StyleSheet.create({
   hideStatusBar: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     flex: 1,
   },
   currentWeather: {

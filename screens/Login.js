@@ -52,7 +52,6 @@ class Login extends Component {
       if (user.uid) {
         this.setState({userFound: true});
         const userId = user.uid;
-        console.log('useridlogin:', userId);
         AsyncStorage.setItem('currentUserId', JSON.stringify(userId));
       }
     } catch (error) {

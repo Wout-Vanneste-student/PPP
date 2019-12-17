@@ -23,6 +23,7 @@ class News extends Component {
       lat: null,
       long: null,
       refreshing: false,
+      newsError: null,
     };
   }
 
@@ -36,7 +37,7 @@ class News extends Component {
   getArticles = async () => {
     try {
       let articles = await fetch(
-        'https://newsapi.org/v2/top-headlines?q=general&apiKey=3ebaa723ec0946adadddac496601ef69',
+        'https://newsapi.org/v2/everything?q=sport&language=en&sortBy=publishedAt&apiKey=3ebaa723ec0946adadddac496601ef69',
       );
       let result = await articles.json();
       let articlesArray = [];
@@ -49,9 +50,10 @@ class News extends Component {
           articlesArray.push(article);
         }
       }
-      this.setState({articles: articlesArray});
+      this.setState({articles: articlesArray, newsError: null});
     } catch (error) {
       console.log('error', error);
+      this.setState({newsError: "We couldn't load the news"});
     }
   };
 
@@ -81,110 +83,101 @@ class News extends Component {
   };
 
   render() {
-    const {articles} = this.state;
-    return (
-      <>
-        {articles.length === 0 ? (
-          <View style={styles.loadingView}>
-            <Text style={styles.loadingText}>Loading latest news</Text>
-            <ActivityIndicator size="large" color="#44234C" />
-          </View>
-        ) : (
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            style={styles.scrollview}
-            refreshControl={
-              <RefreshControl
-                onRefresh={this.onRefresh}
-                refreshing={this.state.refreshing}
-                colors={[colors.wizer]}
-                tintColor="#44234C"
-              />
-            }>
-            <Text style={styles.newsHeader}>
-              The latest news-headlines (worldwide){' '}
-            </Text>
-            {articles.map((item, i) => {
-              let itemDateFormat = null;
-              if (item.publishedAt === null) {
-                itemDateFormat = 'not available';
-              } else {
-                const articleDate = new Date(item.publishedAt);
-                let dd = articleDate.getDate();
-                let mm = articleDate.getMonth() + 1;
-                const yyyy = articleDate.getFullYear();
-                if (dd < 10) {
-                  dd = '0' + dd;
-                }
-                if (mm < 10) {
-                  mm = '0' + mm;
-                }
-                let hh = articleDate.getHours();
-                let minmin = articleDate.getMinutes();
-                if (hh < 10) {
-                  hh = '0' + hh;
-                }
-                if (minmin < 10) {
-                  minmin = '0' + minmin;
-                }
-                const itemTime = hh + ':' + minmin;
-                const itemDate = dd + '/' + mm + '/' + yyyy;
-                itemDateFormat = itemDate + ' - ' + itemTime;
-              }
+    const {articles, newsError} = this.state;
+    return newsError !== null ? (
+      <View style={styles.hideStatusBar}>
+        <Text style={styles.loadingText}>{newsError}</Text>
+      </View>
+    ) : articles.length === 0 ? (
+      <View style={styles.loadingView}>
+        <Text style={styles.loadingText}>Loading latest news</Text>
+        <ActivityIndicator size="large" color="#44234C" />
+      </View>
+    ) : (
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            onRefresh={this.onRefresh}
+            refreshing={this.state.refreshing}
+            colors={[colors.wizer]}
+            tintColor="#44234C"
+          />
+        }>
+        <Text style={styles.newsHeader}>The latest sport-headlines</Text>
+        {articles.map((item, i) => {
+          let itemDateFormat = null;
+          if (item.publishedAt === null) {
+            itemDateFormat = 'not available';
+          } else {
+            const articleDate = new Date(item.publishedAt);
+            let dd = articleDate.getDate();
+            let mm = articleDate.getMonth() + 1;
+            const yyyy = articleDate.getFullYear();
+            if (dd < 10) {
+              dd = '0' + dd;
+            }
+            if (mm < 10) {
+              mm = '0' + mm;
+            }
+            let hh = articleDate.getHours();
+            let minmin = articleDate.getMinutes();
+            if (hh < 10) {
+              hh = '0' + hh;
+            }
+            if (minmin < 10) {
+              minmin = '0' + minmin;
+            }
+            const itemTime = hh + ':' + minmin;
+            const itemDate = dd + '/' + mm + '/' + yyyy;
+            itemDateFormat = itemDate + ' - ' + itemTime;
+          }
 
-              let articleAuthor = '';
-              if (item.author === null) {
-                articleAuthor = 'not available';
-              } else {
-                articleAuthor = JSON.stringify(item.author);
-                articleAuthor = articleAuthor.substring(
-                  1,
-                  articleAuthor.length - 1,
-                );
-                if (articleAuthor.length > 19) {
-                  articleAuthor = articleAuthor.substr(0, 15) + '...';
-                }
-              }
-              return (
-                <View
-                  key={i}
-                  style={
-                    i === articles.length - 1
-                      ? styles.newsItem
-                      : [styles.newsItem, styles.newsItemBorder]
-                  }>
-                  <Image
-                    style={styles.itemImg}
-                    source={{uri: item.urlToImage}}
-                  />
-                  <View style={styles.itemImgFlex}>
-                    <Text style={styles.itemImgText}>{itemDateFormat}</Text>
-                    <Text style={styles.itemImgText}>
-                      Source({articleAuthor})
-                    </Text>
-                  </View>
-                  <Text style={styles.itemTitle}>{item.title}</Text>
-                  <Text style={styles.itemText}>{item.description}</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      Linking.openURL(item.url);
-                    }}
-                    style={styles.itemButton}>
-                    <Text style={styles.itemButtonText}>Read full article</Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </ScrollView>
-        )}
-      </>
+          let articleAuthor = '';
+          if (item.author === null) {
+            articleAuthor = 'not available';
+          } else {
+            articleAuthor = JSON.stringify(item.author);
+            articleAuthor = articleAuthor.substring(
+              1,
+              articleAuthor.length - 1,
+            );
+            if (articleAuthor.length > 16) {
+              articleAuthor = articleAuthor.substr(0, 14) + '...';
+            }
+          }
+          return (
+            <View
+              key={i}
+              style={
+                i === articles.length - 1
+                  ? styles.newsItem
+                  : [styles.newsItem, styles.newsItemBorder]
+              }>
+              <Image style={styles.itemImg} source={{uri: item.urlToImage}} />
+              <View style={styles.itemImgFlex}>
+                <Text style={styles.itemImgText}>{itemDateFormat}</Text>
+                <Text style={styles.itemImgText}>Source({articleAuthor})</Text>
+              </View>
+              <Text style={styles.itemTitle}>{item.title}</Text>
+              <Text style={styles.itemText}>{item.description}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL(item.url);
+                }}
+                style={styles.itemButton}>
+                <Text style={styles.itemButtonText}>Read full article</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        })}
+      </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  scrollview: {
-    height: '50%',
+  hideStatusBar: {
+    // flex: 1,
   },
   newsHeader: {
     color: colors.wizer,

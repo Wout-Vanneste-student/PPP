@@ -60,7 +60,7 @@ class Onboarding extends Component {
     );
   };
   _renderDoneButton = () => {
-    return <Text style={[styles.customButton, styles.rightButton]}>Done</Text>;
+    return <Text style={[styles.customButton, styles.rightButton]}>Next</Text>;
   };
 
   _onDone = () => {
@@ -76,7 +76,7 @@ class Onboarding extends Component {
         {userLoading ? (
           <>
             <Image
-              style={styles.title_image}
+              style={styles.branding_image}
               source={require('../assets/img/wizer_dark.png')}
             />
             <ActivityIndicator size="large" color={colors.wizer} />
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 30,
   },
-  title_image: {
+  branding_image: {
     width: 150,
     height: 75,
     resizeMode: 'contain',
@@ -160,9 +160,9 @@ const styles = StyleSheet.create({
   },
   title_image: {
     width: 250,
-    height: 150,
+    height: 100,
     resizeMode: 'contain',
-    paddingTop: 200,
+    paddingTop: 50,
   },
   bottom_text: {
     color: colors.wizer,

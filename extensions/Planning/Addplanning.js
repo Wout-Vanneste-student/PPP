@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import {Firebase, NotificationService, colors} from '../wizerCore';
+import {Firebase, NotificationService, colors, generateKey} from '../wizerCore';
 import AsyncStorage from '@react-native-community/async-storage';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
@@ -57,7 +57,7 @@ class Addplanning extends Component {
     const notifDate = notifDateFormat + ' at ' + notifTimeFormat;
     const currentUserId = await Firebase.getCurrentUserId();
     const notifMessage = this.state.notifMessage;
-    const notifKey = Math.floor(Math.random() * Math.floor(100000000));
+    const notifKey = generateKey;
     const sortDate = JSON.stringify(date);
     const planningData = {
       notifDate,

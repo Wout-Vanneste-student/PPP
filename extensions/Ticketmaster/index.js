@@ -13,9 +13,8 @@ import {
   ActivityIndicator,
   Linking,
 } from 'react-native';
-
-import {Firebase, NotificationService, colors} from '../wizerCore';
-import AsyncStorage from '@react-native-community/async-storage';
+import {showMessage} from 'react-native-flash-message';
+import {Firebase, NotificationService, colors, generateKey} from '../wizerCore';
 
 class Ticketmaster extends Component {
   constructor() {
@@ -24,6 +23,7 @@ class Ticketmaster extends Component {
       refreshing: false,
       concerts: [],
       loading: true,
+      ticketsError: null,
     };
     this.notif = new NotificationService();
   }
@@ -46,36 +46,37 @@ class Ticketmaster extends Component {
     try {
       let concerts = await fetch(url);
       concertsArray = await concerts.json();
+      let toShowConcerts = [];
+      concertsArray._embedded.events.forEach(event => {
+        const venue = event._embedded.venues[0].name;
+        const city = event._embedded.venues[0].city.name;
+        const concert = event.name;
+        const startTicketSale = event.sales.public.startDateTime;
+        const endTicketSale = event.sales.public.endDateTime;
+        const ticketUrl = event.url;
+        const concertDateTime = event.dates.start.dateTime;
+        const concertDate =
+          event.dates.start.localDate + ' - ' + event.dates.start.localTime;
+        const toAddConcert = {
+          venue,
+          city,
+          concert,
+          concertDateTime,
+          startTicketSale,
+          endTicketSale,
+          ticketUrl,
+          concertDate,
+        };
+        toShowConcerts.push(toAddConcert);
+        toShowConcerts.sort(function(a, b) {
+          return new Date(a.concertDateTime) - new Date(b.concertDateTime);
+        });
+        this.setState({concerts: toShowConcerts, loading: false});
+      });
     } catch (error) {
       console.log('error', error);
+      this.setState({ticketsError: "We couldn't get the requested concerts"});
     }
-    let concerts = [];
-    concertsArray._embedded.events.forEach(event => {
-      const venue = event._embedded.venues[0].name;
-      const city = event._embedded.venues[0].city.name;
-      const concert = event.name;
-      const startTicketSale = event.sales.public.startDateTime;
-      const endTicketSale = event.sales.public.endDateTime;
-      const ticketUrl = event.url;
-      const concertDateTime = event.dates.start.dateTime;
-      const concertDate =
-        event.dates.start.localDate + ' - ' + event.dates.start.localTime;
-      const toAddConcert = {
-        venue,
-        city,
-        concert,
-        concertDateTime,
-        startTicketSale,
-        endTicketSale,
-        ticketUrl,
-        concertDate,
-      };
-      concerts.push(toAddConcert);
-    });
-    concerts.sort(function(a, b) {
-      return new Date(a.concertDateTime) - new Date(b.concertDateTime);
-    });
-    this.setState({concerts: concerts, loading: false});
   };
 
   onRefresh = () => {
@@ -109,7 +110,7 @@ class Ticketmaster extends Component {
     const notifDateFormat = dd + '/' + mm + '/' + yyyy;
     const notifDate = notifDateFormat + ' at ' + notifTimeFormat;
     const currentUserId = await Firebase.getCurrentUserId();
-    const notifKey = Math.floor(Math.random() * Math.floor(100000000));
+    const notifKey = generateKey;
     const sortDate = JSON.stringify(date);
     const planningData = {
       notifDate,
@@ -126,56 +127,69 @@ class Ticketmaster extends Component {
       const uniqueKey = JSON.stringify(notifKey);
       const message = notifMessage;
       this.notif.scheduleNotif(roundSecondsDate, message, uniqueKey);
+      showMessage({
+        message: 'Added to planning!',
+        type: 'info',
+        style: styles.showMessage,
+        titleStyle: styles.showMessageTitle,
+      });
     }
   };
 
   render() {
-    const {concerts, loading} = this.state;
+    const {concerts, loading, ticketsError} = this.state;
+
     return (
       <>
         <SafeAreaView style={styles.topBar} />
         <SafeAreaView style={styles.hideStatusBar}>
           <StatusBar barStyle="light-content" />
-          <View style={styles.concertsWrapper}>
-            <ScrollView
-              style={styles.scrollview}
-              refreshControl={
-                <RefreshControl
-                  colors={[colors.wizer]}
-                  tintColor="#44234C"
-                  onRefresh={this.onRefresh}
-                  refreshing={this.state.refreshing}
-                />
-              }>
-              {loading ? (
-                <View style={styles.hideStatusBar}>
-                  <Text style={styles.loadingText}>Loading concerts</Text>
-                  <ActivityIndicator size="large" color="#44234C" />
-                </View>
-              ) : concerts.length === 0 ? (
-                <View style={styles.imageView}>
-                  <Image
-                    source={require('./assets/noConcert.png')}
-                    style={styles.freeImg}
+          {ticketsError === null ? (
+            <View style={styles.concertsWrapper}>
+              <ScrollView
+                contentContainerStyle={styles.scrollview}
+                refreshControl={
+                  <RefreshControl
+                    colors={[colors.wizer]}
+                    tintColor="#44234C"
+                    onRefresh={this.onRefresh}
+                    refreshing={this.state.refreshing}
                   />
-                  <Text style={styles.concertHelpText}>
-                    No new concerts found {'\n'} Come back later to discover new
-                    concerts.
-                  </Text>
-                </View>
-              ) : (
-                <>
-                  <Text style={styles.itemsTitle}>
-                    Be first in line for these upcoming concerts!
-                  </Text>
-                  <PlannedConcerts
-                    concerts={this.state.concerts}
-                    handleRemindConcert={this.handleRemindConcert}
-                  />
-                </>
-              )}
-            </ScrollView>
-          </View>
+                }>
+                {loading ? (
+                  <View style={styles.hideStatusBar}>
+                    <Text style={styles.loadingText}>Loading concerts</Text>
+                    <ActivityIndicator size="large" color="#44234C" />
+                  </View>
+                ) : concerts.length === 0 ? (
+                  <View style={styles.imageView}>
+                    <Image
+                      source={require('./assets/noConcert.png')}
+                      style={styles.freeImg}
+                    />
+                    <Text style={styles.concertHelpText}>
+                      No new concerts found {'\n'} Come back later to discover
+                      new concerts.
+                    </Text>
+                  </View>
+                ) : (
+                  <>
+                    <Text style={styles.itemsTitle}>
+                      Be first in line for these upcoming concerts!
+                    </Text>
+                    <PlannedConcerts
+                      concerts={this.state.concerts}
+                      handleRemindConcert={this.handleRemindConcert}
+                    />
+                  </>
+                )}
+              </ScrollView>
+            </View>
+          ) : (
+            <View style={styles.errorMessage}>
+              <Text style={styles.loadingText}>{ticketsError}</Text>
+            </View>
+          )}
         </SafeAreaView>
       </>
     );
@@ -252,11 +266,7 @@ const PlannedConcerts = ({concerts, handleRemindConcert}) => {
         const concertDateTime = concertDateFormat + ' - ' + concertTimeFormat;
         return (
           <View
-            style={
-              i === concerts.length - 1
-                ? styles.concertItem
-                : [styles.concertItem, styles.concertItemBorder]
-            }
+            style={i === concerts.length - 1 ? null : styles.concertItemBorder}
             key={i}>
             <View>
               <Text
@@ -305,6 +315,18 @@ const PlannedConcerts = ({concerts, handleRemindConcert}) => {
 };
 
 const styles = StyleSheet.create({
+  errorMessage: {
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    flex: 1,
+  },
+  showMessage: {
+    backgroundColor: colors.wizer,
+  },
+  showMessageTitle: {
+    fontSize: 17,
+    fontFamily:
+      Platform.OS === 'android' ? 'Playfair-Display-bold' : 'Didot-bold',
+  },
   topBar: {
     flex: 0,
     backgroundColor: colors.wizer,
@@ -324,9 +346,6 @@ const styles = StyleSheet.create({
   },
   flexshrink: {
     flexShrink: 1,
-  },
-  scrollview: {
-    height: '70%',
   },
   concertsWrapper: {
     display: 'flex',
@@ -421,7 +440,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 5,
-    paddingBottom: Platform.OS === 'android' ? 10 : 7.5,
+    paddingBottom: Platform.OS === 'android' ? 10 : 5,
     marginTop: 15,
   },
   reminderButtonText: {

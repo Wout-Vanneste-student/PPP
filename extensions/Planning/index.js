@@ -109,10 +109,6 @@ class PlanningClass extends Component {
   handleRemovePlanningItem = async item => {
     this.cancelNotif(item.notificationKey);
     const currentUserId = await Firebase.getCurrentUserId();
-    console.log(
-      'currentuserid in handleremoveplanningitem planning: ',
-      currentUserId,
-    );
     await Firebase.removePlanningItem(currentUserId, item.key);
     this.reloadPlanning();
   };
@@ -124,10 +120,6 @@ class PlanningClass extends Component {
   reloadPastPlanning = async () => {
     const pastList = [];
     const currentUserId = await Firebase.getCurrentUserId();
-    console.log(
-      'currentuserid in reloadpastplanning planning: ',
-      currentUserId,
-    );
     const pastData = await Firebase.getPastPlanningUser(currentUserId);
     pastData.forEach(pastItem => {
       const pastKey = pastItem.key;
@@ -147,10 +139,10 @@ class PlanningClass extends Component {
   };
 
   onRefresh = async () => {
-    this.setState({refreshing: true});
+    // this.setState({refreshing: true});
     await this.reloadPlanning();
     await this.reloadPastPlanning();
-    this.setState({refreshing: false});
+    // this.setState({refreshing: false});
   };
 
   render() {
@@ -158,14 +150,8 @@ class PlanningClass extends Component {
       <Addplanning action={this.addItem} />
     ) : (
       <View style={styles.planningWrapper}>
-        <View>
+        <View style={{height: '70%'}}>
           <ScrollView
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.scrollViewFlex}
-            showsVerticalScrollIndicator={
-              this.state.userPlanning.length === 0 ? false : true
-            }
-            style={styles.scrollview}
             refreshControl={
               <RefreshControl
                 onRefresh={this.onRefresh}
@@ -177,9 +163,6 @@ class PlanningClass extends Component {
             {this.state.userPlanning.length === 0 ? (
               <View style={styles.imageView}>
                 <Image source={require('./free.png')} style={styles.freeImg} />
-                <Text style={styles.planningHelp}>
-                  You're totally free, relax!
-                </Text>
               </View>
             ) : (
               <UserPlanning
@@ -190,6 +173,13 @@ class PlanningClass extends Component {
             )}
           </ScrollView>
         </View>
+        {this.state.userPlanning.length === 0 ? (
+          <Text style={styles.planningHelp}>You're totally free, relax!</Text>
+        ) : (
+          <Text style={styles.planningHelp}>
+            You can scroll through your planning.
+          </Text>
+        )}
         <TouchableOpacity
           style={styles.big_button}
           onPress={() => this.setState({addPlanning: true})}>
@@ -238,9 +228,9 @@ const UserPlanning = ({data, handleRemovePlanningItem}) => {
           );
         })}
       </View>
-      <Text style={styles.planningHelp}>
+      {/* <Text style={styles.planningHelp}>
         You can scroll through your planning.
-      </Text>
+      </Text> */}
     </>
   );
 };
@@ -253,14 +243,6 @@ const styles = StyleSheet.create({
   flexshrink: {
     flexShrink: 1,
   },
-  scrollview: {
-    height: '80%',
-  },
-  scrollViewFlex: {
-    display: 'flex',
-    height: '100%',
-    justifyContent: 'space-between',
-  },
   planningWrapper: {
     display: 'flex',
     height: '100%',
@@ -272,6 +254,7 @@ const styles = StyleSheet.create({
     color: colors.wizer,
     textAlign: 'center',
     marginTop: 30,
+    marginBottom: 30,
   },
   customfont: {
     fontFamily:
@@ -348,9 +331,7 @@ const styles = StyleSheet.create({
     fontFamily:
       Platform.OS === 'android' ? 'Playfair-Display-regular' : 'Didot',
     fontSize: 17.5,
-    // flex: 1,
-    // flexWrap: 'wrap',
-    // marginRight: 35,
+    paddingRight: 20,
   },
   removeButton: {
     marginRight: 15,

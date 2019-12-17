@@ -36,9 +36,17 @@ class Extensions extends Component {
           if (name.length > 11) {
             name = name.substr(0, 9) + '...';
           }
+          let devidedByThree = false;
+          if (i % 3 === 0) {
+            devidedByThree = true;
+          }
           return (
             <TouchableOpacity
-              style={styles.extensionButton}
+              style={
+                !devidedByThree
+                  ? styles.extensionButton
+                  : [styles.extensionButton, styles.extensionButtonThree]
+              }
               key={i}
               onPress={() =>
                 this.setState({
@@ -134,7 +142,6 @@ const styles = StyleSheet.create({
   extensionsGrid: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     flexWrap: 'wrap',
   },
   noExtensions: {
@@ -161,8 +168,12 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 5,
     marginVertical: 15,
+    marginRight: 'auto',
+  },
+  extensionButtonThree: {
+    marginLeft: '4%',
+    marginRight: '4%',
   },
   extensionsIcon: {
     width: 50,

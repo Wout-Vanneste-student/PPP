@@ -131,8 +131,8 @@ android {
         applicationId "com.wizer"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 12
-        versionName "1.7"
+        versionCode 17
+        versionName "1.93"
     }
     splits {
         abi {

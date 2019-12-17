@@ -133,12 +133,10 @@ class Loadprofile extends Component {
       };
       pastList.push(toAddPastItem);
     });
-    const currentUserId = await AsyncStorage.getItem('currentUserId');
-    const currentUserIdloaddata = await Firebase.getCurrentUserId();
-    console.log(
-      'currentuserid in loaduserdata in loadprofile: ',
-      currentUserIdloaddata,
-    );
+    let currentUserId = await AsyncStorage.getItem('currentUserId');
+    if (!currentUserId) {
+      currentUserId = await Firebase.getCurrentUserId();
+    }
     removeList.forEach(async item => {
       const pastMessage = item.notificationMessage;
       const pastItemDate = item.notificationDate;
